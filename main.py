@@ -3,9 +3,8 @@
 from multiprocessing import Process, Value
 from ctypes import Structure, c_int
 import os
-from serialCom import SerialController
 from motorContl import MotorController
-from imageProcessing import ImageProcessing, EnemyGoalColorE
+from imageProcessing import ImageProcessing
 from debug import ERROR, WARN, INFO, DEBUG, TRACE
 
 # 共有メモリの構造体
@@ -27,7 +26,7 @@ if __name__ == '__main__':
     # 画像処理インスタンスの生成
     imageProcessing = ImageProcessing()
 
-    p_motorContl = Process(target=motorController.target, args=(shmem, serialController))
+    p_motorContl = Process(target=motorController.target, args=(shmem,))
     p_imageProcessing = Process(target=imageProcessing.target, args=(shmem,))
 
     p_motorContl.start()

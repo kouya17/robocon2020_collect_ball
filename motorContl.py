@@ -1,11 +1,11 @@
 # coding: UTF-8
 
-from serialCom import SerialController
 import time
 from enum import Enum
 from debug import ERROR, WARN, INFO, DEBUG, TRACE
+from miniMotorDriver import MiniMotorDriver
 import os
-import ConfigParser
+import configparser
 
 # ボール保持状態用列挙型
 class BallStateE(Enum):
@@ -71,12 +71,15 @@ class MotorController:
         self.is_dribble_started = False
         # モータ制御後処理インスタンス生成
         self.motorControlPostProcessor = MotorControlPostProcessor()
+        # モータドライバ制御用インスタンス生成
+        self.left_motor = MiniMotorDriver(0x60)
+        self.right_motor = MiniMotorDriver(0x65)
         # 設定値読み込み
-        self.getParameterSetting()
+        #self.getParameterSetting()
 
     def getParameterSetting(self):
         # パラメータ値設定ファイルを読み込み
-        config = ConfigParser.SafeConfigParser()
+        config = configparser.SafeConfigParser()
         config.read(MotorController.PARAMETER_INI_PATH)
 
         self.DEBUG_SHOOT_ALGORITHM = int(config.get(MotorController.PARAMETER_CUSTOM_SECTION, 'shoot_algo'))
@@ -319,18 +322,15 @@ class MotorController:
             return MotorController.SPEED_STOP
     
     # モータの値を計算する
-    def calcMotorPowers(self, ballState, shmem):
+    def calcMotorPowers(self, shmem):
         # ボール保持状態の場合
-        if ballState == BallStateE.HAVE_BALL:
-            # 画像処理結果を使ってゴールへ向かう
-            return self.calcMotorPowersByGoalAngle(shmem.enemyGoalAngle, shmem.myGoalAngle, shmem.fieldCenterAngle)
+        # 画像処理結果を使ってゴールへ向かう
+        #return self.calcMotorPowersByGoalAngle(shmem.enemyGoalAngle, shmem.myGoalAngle, shmem.fieldCenterAngle)
 
-        # ボールなし状態の場合
-        else:
-            # 赤外線センサと距離センサの情報を使ってボールへ向かう
-            #return self.calcMotorPowersByBallAngleAndDis(shmem.irAngle, shmem.uSonicDis)
-            # 距離センサは使用しない
-            return self.calcMotorPowersByBallAngle(shmem.irAngle)
+        # 赤外線センサと距離センサの情報を使ってボールへ向かう
+        #return self.calcMotorPowersByBallAngleAndDis(shmem.irAngle, shmem.uSonicDis)
+        # 距離センサは使用しない
+        return self.calcMotorPowersByBallAngle(shmem.ballAngle)
     
     def getSetting(self):
         # モータ値設定ファイルを読み込み
@@ -348,44 +348,45 @@ class MotorController:
             WARN('motor setting file read failure')
             return 'NONE'
 
-    # モータの値を計算しEV3へ送る
-    def calcAndSendMotorPowers(self, shmem, serial):
+    # モータの値を計算しドライバへ送る
+    def calcAndSendMotorPowers(self, shmem):
         while 1:
             # ボール状態取得
-            ballState = self.getBallStateByTouch(shmem.isTouched)
-            DEBUG('ballState = ', ballState)
+            #ballState = self.getBallStateByTouch(shmem.isTouched)
+            #DEBUG('ballState = ', ballState)
             # モータ値計算
-            motorPowers = self.calcMotorPowers(ballState, shmem)
+            #motorPowers = self.calcMotorPowers(ballState, shmem)
+            motorPowers = self.calcMotorPowers(shmem)
             # モーター値後処理(現在は首振り検知処理のみ)
             motorPowers = self.motorControlPostProcessor.escapeSwing(motorPowers)
             # 設定ファイルの内容を反映
-            setting = self.getSetting()
-            if setting != 'NONE':
-                motorPowers = MotorController.DIC_SETTING_TO_MOTOR_VALUE.get(setting)
+            #setting = self.getSetting()
+            #if setting != 'NONE':
+            #    motorPowers = MotorController.DIC_SETTING_TO_MOTOR_VALUE.get(setting)
             # モータ値を正常値にまるめる
             motorPowers = self.roundOffMotorSpeeds(motorPowers)
             # 送信伝文生成
-            sendText = str(int(motorPowers[0])) + "," + str(int(motorPowers[1])) + "\n"
+            #sendText = str(int(motorPowers[0])) + "," + str(int(motorPowers[1])) + "\n"
             # モータ値送信
-            serial.write(sendText)
-            # 0.05sごとに実行
-            # 本当は全力でぶん回したい
-            # ラズパイ側はマルチプロセスを採用しているので問題ないと思うが
-            # EV3側は計算資源を通信に占有される恐れがあるためとりあえず0.05sにしておく
-            INFO('ball=' + str(ballState).rjust(15),
-                 'motor=' + str(motorPowers[0]).rjust(4) + ',' + str(motorPowers[1]).rjust(4),
-                 'IR=' + str(shmem.irAngle).rjust(4),
-                 'touch=' + str(shmem.isTouched).rjust(4),
-                 'enemy=' + str(shmem.enemyGoalAngle).rjust(4) + ',' + str(shmem.enemyGoalDis).rjust(4),
-                 'my=' + str(shmem.myGoalAngle).rjust(4) + ',' + str(shmem.myGoalDis).rjust(4),
-                 'center=' + str(shmem.fieldCenterAngle).rjust(4) + ',' + str(shmem.fieldCenterDis).rjust(4),
+            #serial.write(sendText)
+            self.left_motor.drive(motorPowers[0])
+            self.right_motor.drive(motorPowers[1])
+            # とりあえず一定時間間隔で動かす
+            #INFO('ball=' + str(ballState).rjust(15),
+            INFO('motor=' + str(motorPowers[0]).rjust(4) + ',' + str(motorPowers[1]).rjust(4),
+            #     'IR=' + str(shmem.irAngle).rjust(4),
+            #     'touch=' + str(shmem.isTouched).rjust(4),
+            #     'enemy=' + str(shmem.enemyGoalAngle).rjust(4) + ',' + str(shmem.enemyGoalDis).rjust(4),
+            #     'my=' + str(shmem.myGoalAngle).rjust(4) + ',' + str(shmem.myGoalDis).rjust(4),
+            #     'center=' + str(shmem.fieldCenterAngle).rjust(4) + ',' + str(shmem.fieldCenterDis).rjust(4),
+                 'ball=' + str(shmem.ballAngle).rjust(4) + ',' + str(shmem.ballDis).rjust(4),
                  )
             time.sleep(0.1)
     
     # 起動処理
-    def target(self, shmem, serial):
+    def target(self, shmem):
         DEBUG('MotorController target() start')
-        self.calcAndSendMotorPowers(shmem, serial)
+        self.calcAndSendMotorPowers(shmem)
 
     # 停止処理(仮)
     def close():
