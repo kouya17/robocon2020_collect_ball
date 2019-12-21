@@ -144,6 +144,7 @@ class ImageProcessing:
     # @param cy 領域のy座標
     # @param area_size 領域の面積
     def calcBallDirection(self, cx, cy, area_size):
+        '''
         # TODO: cx = -1のときはどうする？
         vx = self.CAMERA_CENTER_CY - cy
         vy = self.CAMERA_CENTER_CX - cx
@@ -154,7 +155,11 @@ class ImageProcessing:
         except:
             ball_distance = -1
             ball_angle = 360
+        '''
 
+        ball_angle = cx - self.CAMERA_CENTER_CX
+        ball_distance = 10
+        
         return int(ball_angle), int(ball_distance)
 
     def imageProcessingFrame(self, frame, shmem):
