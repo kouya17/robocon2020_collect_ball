@@ -16,7 +16,7 @@ class ImageProcessing:
     # 画像出力の有効無効
     ENABLE = 1
     DISABLE = 0
-    DEBUG_IMSHOW = DISABLE
+    DEBUG_IMSHOW = ENABLE
 
     BLUE_HSV_RANGE_MIN = [55, 70, 10]
     BLUE_HSV_RANGE_MAX = [120, 150, 80]
@@ -60,9 +60,9 @@ class ImageProcessing:
         mask = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
         mask = cv2.bitwise_and(mask, mask, mask=mask_0)
 
-        # 画角の前後左右と画像表示の上下左右を揃えるために画像を転置する。
         if self.DEBUG_IMSHOW == self.ENABLE:
-            cv2.imshow('Mask' + color_name, mask.transpose((1, 0)))
+            #cv2.imshow('Mask' + color_name, mask.transpose((1, 0)))
+            cv2.imshow('Mask' + color_name, mask)
 
         _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -104,9 +104,10 @@ class ImageProcessing:
         cv2.circle(kernel, (self.KARNEL_R, self.KARNEL_R), self.KARNEL_R, 1, thickness=-1)
         mask = cv2.dilate(mask, kernel, iterations=1)
 
-        # 画角の前後左右と画像表示の上下左右を揃えるために画像を転置する。
         if self.DEBUG_IMSHOW == self.ENABLE:
-            cv2.imshow('Mask' + color_name, mask.transpose((1, 0)))
+            #cv2.imshow('Mask' + color_name, mask.transpose((1, 0)))
+            cv2.imshow('Mask' + color_name, mask)
+
         _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         convex_hull_list = []
@@ -194,12 +195,20 @@ class ImageProcessing:
         DEBUG('Yellow :' + str(yellow_area_size).rjust(8), 'Blue :' + str(blue_area_size).rjust(8))
 
         # 画角の前後左右と画像表示の上下左右を揃えるためにx座標とy座標を交換する。
+        '''
         yellow_cx = yellow_cy_t
         yellow_cy = yellow_cx_t
         blue_cx = blue_cy_t
         blue_cy = blue_cx_t
         field_cx = field_cy_t
         field_cy = field_cx_t
+        '''
+        yellow_cx = yellow_cx_t
+        yellow_cy = yellow_cy_t
+        blue_cx = blue_cx_t
+        blue_cy = blue_cy_t
+        field_cx = field_cx_t
+        field_cy = field_cy_t
 
         yellow_goal_angle, yellow_goal_distance = self.calcBallDirection(yellow_cx, yellow_cy, yellow_area_size)
         blue_goal_angle, blue_goal_distance = self.calcBallDirection(blue_cx, blue_cy, blue_area_size)
@@ -230,7 +239,8 @@ class ImageProcessing:
                     # 画角の前後左右と画像表示の上下左右を揃えるために画像を転置する。
                     
                     if self.DEBUG_IMSHOW == self.ENABLE:
-                        cv2.imshow('Frame', stream.array.transpose((1, 0, 2)))
+                        #cv2.imshow('Frame', stream.array.transpose((1, 0, 2)))
+                        cv2.imshow('Frame', stream.array)
                         cv2.moveWindow('Frame', 0, 30)
                         cv2.moveWindow('MaskYellow', 482, 30)
                         cv2.moveWindow('MaskBlue', 964, 30)
