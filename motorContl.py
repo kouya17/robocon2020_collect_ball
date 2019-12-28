@@ -312,11 +312,12 @@ class MotorController:
                 speed = ballAngle / MotorController.CORRECTION_VALUE_BALL_ANGLE_TO_SPEED
                 # 絶対値が100を超える場合は100に丸める
                 #speed = self.roundOffWithin100(speed)
-                return (-speed), speed
+                # left, rightの順で返却
+                return speed, (-speed)
         elif self.DEBUG_CHASE_ALGORITHM == 1:
             # P制御
-            return MotorController.SPEED_CHASE - MotorController.K_CHASE_ANGLE * ballAngle, \
-                   MotorController.SPEED_CHASE + MotorController.K_CHASE_ANGLE * ballAngle
+            return MotorController.SPEED_CHASE + MotorController.K_CHASE_ANGLE * ballAngle, \
+                   MotorController.SPEED_CHASE - MotorController.K_CHASE_ANGLE * ballAngle
         else:
             ERROR('Invalid Value : DEBUG_CHASE_ALGORITHM =', self.DEBUG_CHASE_ALGORITHM)
             return MotorController.SPEED_STOP
@@ -373,7 +374,7 @@ class MotorController:
             self.right_motor.drive(motorPowers[1])
             # とりあえず一定時間間隔で動かす
             #INFO('ball=' + str(ballState).rjust(15),
-            INFO('motor=' + str(motorPowers[0]).rjust(4) + ',' + str(motorPowers[1]).rjust(4),
+            INFO('motor l=' + str(motorPowers[0]).rjust(4) + ', r=' + str(motorPowers[1]).rjust(4),
             #     'IR=' + str(shmem.irAngle).rjust(4),
             #     'touch=' + str(shmem.isTouched).rjust(4),
             #     'enemy=' + str(shmem.enemyGoalAngle).rjust(4) + ',' + str(shmem.enemyGoalDis).rjust(4),
@@ -381,7 +382,7 @@ class MotorController:
             #     'center=' + str(shmem.fieldCenterAngle).rjust(4) + ',' + str(shmem.fieldCenterDis).rjust(4),
                  'ball=' + str(shmem.ballAngle).rjust(4) + ',' + str(shmem.ballDis).rjust(4),
                  )
-            time.sleep(0.1)
+            time.sleep(0.5)
     
     # 起動処理
     def target(self, shmem):

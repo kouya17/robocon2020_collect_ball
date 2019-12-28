@@ -27,11 +27,9 @@ class ImageProcessing:
     FIELD_AND_WALL_HSV_RANGE_MIN = [25, 70, 0]
     FIELD_AND_WALL_RANGE_MAX = [120, 255, 255]
 
-    CAMERA_CENTER_CX_T = 240
-    CAMERA_CENTER_CY_T = 240
-    CAMERA_CENTER_CX = CAMERA_CENTER_CY_T
-    CAMERA_CENTER_CY = CAMERA_CENTER_CX_T
-    CAMERA_RANGE_R = 170
+    CAMERA_CENTER_CX = 240
+    CAMERA_CENTER_CY = 240
+    #CAMERA_RANGE_R = 170
 
     KARNEL_R = 4
     KARNEL_SIZE = 2 * KARNEL_R + 1
@@ -52,22 +50,22 @@ class ImageProcessing:
     # @param color_name 検知する色の名前
     # @detail
     def colorDetect2(self, hsv_img, color_name):
-        mask_0 = np.zeros((480, 480, 1), np.uint8)
-        cv2.circle(mask_0, (self.CAMERA_CENTER_CX_T, self.CAMERA_CENTER_CY_T), self.CAMERA_RANGE_R, 255, thickness=-1)
+        #mask_0 = np.zeros((480, 480, 1), np.uint8)
+        #cv2.circle(mask_0, (self.CAMERA_CENTER_CX_T, self.CAMERA_CENTER_CY_T), self.CAMERA_RANGE_R, 255, thickness=-1)
 
         #if color_name == 'RED':
         # 赤色のHSVの値域1
-        hsv_range_min = np.array([0, 64, 0])
+        hsv_range_min = np.array([0, 200, 80])
         hsv_range_max = np.array([30, 255, 255])
         mask1 = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
 
         # 赤色のHSVの値域2
-        hsv_range_min = np.array([150, 64, 0])
+        hsv_range_min = np.array([150, 200, 80])
         hsv_range_max = np.array([179, 255, 255])
         mask2 = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
         mask = mask1 + mask2
         # mask = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
-        mask = cv2.bitwise_and(mask, mask, mask=mask_0)
+        #mask = cv2.bitwise_and(mask, mask, mask=mask_0)
 
         if self.DEBUG_IMSHOW == self.ENABLE:
             #cv2.imshow('Mask' + color_name, mask.transpose((1, 0)))
@@ -102,11 +100,11 @@ class ImageProcessing:
     # @param color_name 検知する色の名前
     # @detail
     def colorDetect(self, hsv_img, hsv_range_min, hsv_range_max, color_name):
-        mask_0 = np.zeros((480, 480, 1), np.uint8)
-        cv2.circle(mask_0, (self.CAMERA_CENTER_CX_T, self.CAMERA_CENTER_CY_T), self.CAMERA_RANGE_R, 255, thickness=-1)
+        #mask_0 = np.zeros((480, 480, 1), np.uint8)
+        #cv2.circle(mask_0, (self.CAMERA_CENTER_CX_T, self.CAMERA_CENTER_CY_T), self.CAMERA_RANGE_R, 255, thickness=-1)
 
         mask = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
-        mask = cv2.bitwise_and(mask, mask, mask=mask_0)
+        #mask = cv2.bitwise_and(mask, mask, mask=mask_0)
 
         if self.DEBUG_IMSHOW == self.ENABLE:
             #cv2.imshow('Mask' + color_name, mask.transpose((1, 0)))
@@ -141,12 +139,12 @@ class ImageProcessing:
     # @param color_name 検知する色の名前
     # @detail
     def wallDetect(self, hsv_img, hsv_range_min, hsv_range_max, color_name):
-        mask_0 = np.zeros((480, 480, 1), np.uint8)
-        cv2.circle(mask_0, (self.CAMERA_CENTER_CX_T, self.CAMERA_CENTER_CY_T), self.CAMERA_RANGE_R, 255,
-                   thickness=-1)
+        #mask_0 = np.zeros((480, 480, 1), np.uint8)
+        #cv2.circle(mask_0, (self.CAMERA_CENTER_CX_T, self.CAMERA_CENTER_CY_T), self.CAMERA_RANGE_R, 255,
+        #           thickness=-1)
 
         mask = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
-        mask = cv2.bitwise_and(mask, mask, mask=mask_0)
+        #mask = cv2.bitwise_and(mask, mask, mask=mask_0)
         # TODO: initに移動する
         kernel = np.zeros((self.KARNEL_SIZE, self.KARNEL_SIZE), np.uint8)
         cv2.circle(kernel, (self.KARNEL_R, self.KARNEL_R), self.KARNEL_R, 1, thickness=-1)
@@ -214,11 +212,11 @@ class ImageProcessing:
     def imageProcessingFrame(self, frame, shmem):
         # HSV色空間に変換
         hsv_img = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        cv2.circle(frame, (self.CAMERA_CENTER_CX_T, self.CAMERA_CENTER_CY_T),
-                   self.CAMERA_RANGE_R, (0, 0, 255), thickness=1)
-        cv2.line(frame, (self.CAMERA_CENTER_CX_T, 0), (self.CAMERA_CENTER_CX_T, 480),
+        #cv2.circle(frame, (self.CAMERA_CENTER_CX_T, self.CAMERA_CENTER_CY_T),
+        #           self.CAMERA_RANGE_R, (0, 0, 255), thickness=1)
+        cv2.line(frame, (self.CAMERA_CENTER_CX, 0), (self.CAMERA_CENTER_CX, 480),
                  (0, 0, 255), thickness=1)
-        cv2.line(frame, (0, self.CAMERA_CENTER_CY_T), (480, self.CAMERA_CENTER_CY_T),
+        cv2.line(frame, (0, self.CAMERA_CENTER_CY), (480, self.CAMERA_CENTER_CY),
                  (0, 0, 255), thickness=1)
         '''
         # 黄色領域の検知
@@ -244,7 +242,7 @@ class ImageProcessing:
 
         # 赤色領域の検知
         red_cx, red_cy, red_area_size, red_convex = self.colorDetect2(hsv_img, 'Red')
-        if red_cx_t > -1:
+        if red_cx > -1:
             self.draw_marker(frame, red_cx, red_cy, (255, 30, 30))
 
         #DEBUG('Yellow :' + str(yellow_area_size).rjust(8), 'Blue :' + str(blue_area_size).rjust(8))
@@ -310,7 +308,7 @@ class ImageProcessing:
                         #cv2.moveWindow('MaskWall', 482, 502)
               
                     # 共有メモリに書き込む
-                    shmem.ballAngle = int(red_ball_angle)
+                    shmem.ballAngle = int(red_ball_angle * 90 / 240)
                     shmem.ballDis = int(red_ball_distance)
 
                     # "q"でウィンドウを閉じる
