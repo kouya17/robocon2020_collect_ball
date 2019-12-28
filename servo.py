@@ -1,3 +1,5 @@
+# coding: UTF-8
+
 import RPi.GPIO as GPIO
 import time
 
@@ -17,19 +19,25 @@ servo = GPIO.PWM(gp_out, 50)
 servo.start(0)
 #time.sleep(1)
 
-for i in range(3):
+servo.ChangeDutyCycle(7.25)
+current_duty = 7.25
+target_duty = 12
+duration = 3
+diff_t = 0.1
+count = int(duration / diff_t)
+for i in range(count):
     #デューティサイクルの値を変更することでサーボが回って角度が変わる。
-    servo.ChangeDutyCycle(2.5)
-    time.sleep(0.5)
+    #servo.ChangeDutyCycle(2.5)
+    #time.sleep(0.5)
 
-    servo.ChangeDutyCycle(7.25)
-    time.sleep(0.5)
+    servo.ChangeDutyCycle(current_duty + ((i + 1) * ((target_duty - current_duty) / count)))
+    time.sleep(diff_t)
 
-    servo.ChangeDutyCycle(12)
-    time.sleep(0.5)
+    #servo.ChangeDutyCycle(12)
+    #time.sleep(0.5)
 
-    servo.ChangeDutyCycle(7.25)
-    time.sleep(0.5)
+    #servo.ChangeDutyCycle(7.25)
+    #time.sleep(0.5)
 
 servo.stop()
 GPIO.cleanup()
