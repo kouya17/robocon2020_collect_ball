@@ -1,0 +1,24 @@
+# UML diagrams
+## The whole system
+### Activity diagram
+```plantuml
+start
+if (has ball?) then (yes)
+  :find the ball station by image processing;
+  if (ball station exist near?) then (yes)
+    :raise the ball catch box;
+    :go back in a limited time;
+    :turn by 180 degrees;
+  else (no)
+    :approach the ball station;
+  endif
+else (no)
+  :find a ball by image processing;
+  if (ball exist near?) then (yes)
+    :lower the ball catch box;
+  else (no)
+    :approach a ball;
+  endif
+endif
+end
+```
