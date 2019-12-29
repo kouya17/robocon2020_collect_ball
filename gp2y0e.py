@@ -10,7 +10,7 @@ class Gpey20e:
     
     """
 
-    def test(self):
+    def test2(self):
         """
 
         Args:

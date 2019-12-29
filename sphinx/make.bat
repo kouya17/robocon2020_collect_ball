@@ -26,6 +26,7 @@ if errorlevel 9009 (
 )
 
 :html
+sphinx-apidoc -f -o .\ ..\
 %SPHINXBUILD% -b html %SOURCEDIR% "..\docs" %SPHINXOPTS% %O%
 goto end
 
