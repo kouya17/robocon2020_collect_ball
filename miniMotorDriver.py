@@ -3,6 +3,7 @@
 import smbus
 from debug import ERROR, WARN, INFO, DEBUG, TRACE
 
+
 class MiniMotorDriver:
     # @brief コンスタラクタ
     # @detail 初期化処理を行う
@@ -29,4 +30,3 @@ class MiniMotorDriver:
 
     def brake(self):
         self._i2c.write_byte_data(self._addr, 0x00, 0x03)
-

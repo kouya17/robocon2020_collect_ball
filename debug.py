@@ -1,25 +1,27 @@
 # -*- coding: utf8 -*-
 
-# How to use
-#
-# 1. debug printを使用したいファイルで以下のようにimportする。
-# from debug import ERROR, WARN, INFO, DEBUG, TRACE
-#
-# 2. DEBUG_LEVELに、ログ出力のレベルを指定する。
-#    指定したレベル以上のログが出力される。
-#    例：DEBUG_LEVEL_INFO を指定すると、ERROR,WARN,INFOが出力される。
-#
-#
-# 3. 使用したいlevelのdebug printを通常のprint文のように記述する。
-#    複数引数にも対応している。
-#
-# debug levelの目安
-#
-# ERROR : プレー続行不可能になるようなエラー
-# WARN  : プレー続行不可能とはならないような警告
-# INFO  : 他スレッドとの結合動作において表示したい情報
-# DEBUG : 自スレッドのみの単体デバッグにおいて表示したい情報
-# TRACE : 処理の開始終了や分岐の出入りなど、ルートを確認するための情報
+"""
+How to use
+
+1. debug printを使用したいファイルで以下のようにimportする。
+from debug import ERROR, WARN, INFO, DEBUG, TRACE
+
+2. DEBUG_LEVELに、ログ出力のレベルを指定する。
+   指定したレベル以上のログが出力される。
+   例：DEBUG_LEVEL_INFO を指定すると、ERROR,WARN,INFOが出力される。
+
+
+3. 使用したいlevelのdebug printを通常のprint文のように記述する。
+   複数引数にも対応している。
+
+debug levelの目安
+
+ERROR : プレー続行不可能になるようなエラー
+WARN  : プレー続行不可能とはならないような警告
+INFO  : 他スレッドとの結合動作において表示したい情報
+DEBUG : 自スレッドのみの単体デバッグにおいて表示したい情報
+TRACE : 処理の開始終了や分岐の出入りなど、ルートを確認するための情報
+"""
 
 import datetime
 

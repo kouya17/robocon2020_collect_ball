@@ -7,15 +7,18 @@ from motorContl import MotorController
 from imageProcessing import ImageProcessing
 from debug import ERROR, WARN, INFO, DEBUG, TRACE
 
+
 # 共有メモリの構造体
 class Point(Structure):
     _fields_ = [('ballAngle', c_int), ('ballDis', c_int)]
+
 
 def info(title):
     INFO(title)
     INFO('module name:', __name__)
     INFO('parent process:', os.getppid())
     INFO('process id:', os.getpid())
+
 
 if __name__ == '__main__':
     info('main line')
@@ -36,4 +39,3 @@ if __name__ == '__main__':
 
     p_motorContl.join()
     p_imageProcessing.join()
-

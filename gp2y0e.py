@@ -6,7 +6,7 @@ from debug import DEBUG, TRACE
 
 class Gp2y0e:
     """
-
+    
     GP2Y0E driver class
 
     Examples:
