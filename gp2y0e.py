@@ -38,5 +38,5 @@ class Gp2y0e:
         data = self._bus.read_i2c_block_data(self._address, 0x5E, 2)
         distance = (data[0] << 4) | data[1]
         distance = distance / 64
-        DEBUG('distance = ' + str(distance))
+        DEBUG('distance = ' + str(distance) + ' [cm]')
         return distance
