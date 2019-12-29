@@ -1,28 +1,42 @@
 # coding: UTF-8
 
-from debug import ERROR, WARN, INFO, DEBUG, TRACE
+import smbus
+from debug import DEBUG, TRACE
 
 
-class Gpey20e:
+class Gp2y0e:
     """
 
-    doc test
+    GP2Y0E driver class
+
+    Examples:
+        >>> address = 0x40
+        >>> g = Gp2y0e(address)
+        >>> print(g.read)
+        10.7
+    
+    Attributes:
+        _address (int) : slave address
+        _bus (smbus.SMBus) : i2c bus
     
     """
 
-    def test2(self):
+    def __init__(self, address):
+        TRACE('Gp2y0e generated: address = ' + str(address))
+        self._bus = smbus.SMBus(1)
+        self._address = address
+    
+    def read(self):
         """
 
-        Args:
-            x (int): aaa
-        
+        read distance value
+
         Returns:
-            int: aaa
-        
-        Examples:
-            >>> p = Gpey20e()
-            >>> p.init(1)
-            p is initialized
+            float: distance value [cm]
         
         """
-        self.test = 1
+        data = self._bus.read_i2c_block_data(self._address, 0x5E, 2)
+        distance = (data[0] << 4) | data[1]
+        distance = distance / 64
+        DEBUG('distance = ' + str(distance))
+        return distance
