@@ -1,5 +1,5 @@
-robocon2020_collect_ball
-========================
+collectBall
+===========
 
 .. toctree::
    :maxdepth: 4

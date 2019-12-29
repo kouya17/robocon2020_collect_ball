@@ -4,6 +4,7 @@ import time
 from enum import Enum
 from debug import ERROR, WARN, INFO, DEBUG, TRACE
 from miniMotorDriver import MiniMotorDriver
+from servo import Servo
 import os
 import configparser
 
@@ -74,6 +75,7 @@ class MotorController:
         # モータドライバ制御用インスタンス生成
         self.left_motor = MiniMotorDriver(0x60)
         self.right_motor = MiniMotorDriver(0x65)
+        self.servo = Servo(4)
         # 設定値読み込み
         #self.getParameterSetting()
 

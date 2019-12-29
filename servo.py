@@ -17,7 +17,8 @@ class Servo:
         self._servo = GPIO.PWM(self._pin_no, 50)
         # パルス出力開始。　servo.start( [デューティサイクル 0~100%] )
         # とりあえずゼロ指定だとサイクルが生まれないので特に動かないっぽい？
-        self._servo.start(7.25)
+        #self._servo.start(7.25)
+        self._servo.start(0)
         self._current_duty = 7.25
     
     def write(self, target_duty, duration, diff_t):

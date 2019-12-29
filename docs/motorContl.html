@@ -145,8 +145,257 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="motorcontl-module">
-<h1>motorContl module<a class="headerlink" href="#motorcontl-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-motorContl">
+<span id="motorcontl-module"></span><h1>motorContl module<a class="headerlink" href="#module-motorContl" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="motorContl.BallStateE">
+<em class="property">class </em><code class="sig-prename descclassname">motorContl.</code><code class="sig-name descname">BallStateE</code><a class="headerlink" href="#motorContl.BallStateE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="motorContl.BallStateE.HAVE_BALL">
+<code class="sig-name descname">HAVE_BALL</code><em class="property"> = 0</em><a class="headerlink" href="#motorContl.BallStateE.HAVE_BALL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.BallStateE.NOT_HAVE_BALL">
+<code class="sig-name descname">NOT_HAVE_BALL</code><em class="property"> = 1</em><a class="headerlink" href="#motorContl.BallStateE.NOT_HAVE_BALL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="motorContl.MotorControlPostProcessor">
+<em class="property">class </em><code class="sig-prename descclassname">motorContl.</code><code class="sig-name descname">MotorControlPostProcessor</code><a class="headerlink" href="#motorContl.MotorControlPostProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="motorContl.MotorControlPostProcessor.SPEED_ESCAPE_FROM_SWING">
+<code class="sig-name descname">SPEED_ESCAPE_FROM_SWING</code><em class="property"> = (5, 5)</em><a class="headerlink" href="#motorContl.MotorControlPostProcessor.SPEED_ESCAPE_FROM_SWING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorControlPostProcessor.THRESHOLD_COUNT_SWING_DETECT">
+<code class="sig-name descname">THRESHOLD_COUNT_SWING_DETECT</code><em class="property"> = 3</em><a class="headerlink" href="#motorContl.MotorControlPostProcessor.THRESHOLD_COUNT_SWING_DETECT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorControlPostProcessor.THRESHOLD_TIME_SWING_DETECT">
+<code class="sig-name descname">THRESHOLD_TIME_SWING_DETECT</code><em class="property"> = 2</em><a class="headerlink" href="#motorContl.MotorControlPostProcessor.THRESHOLD_TIME_SWING_DETECT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorControlPostProcessor.TIME_ESCAPE_FROM_SWING">
+<code class="sig-name descname">TIME_ESCAPE_FROM_SWING</code><em class="property"> = 1</em><a class="headerlink" href="#motorContl.MotorControlPostProcessor.TIME_ESCAPE_FROM_SWING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorControlPostProcessor.escapeSwing">
+<code class="sig-name descname">escapeSwing</code><span class="sig-paren">(</span><em class="sig-param">motorPowers</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorControlPostProcessor.escapeSwing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorControlPostProcessor.isNeedToEscapeSwing">
+<code class="sig-name descname">isNeedToEscapeSwing</code><span class="sig-paren">(</span><em class="sig-param">motorPowers</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorControlPostProcessor.isNeedToEscapeSwing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorControlPostProcessor.isSwingStarted">
+<code class="sig-name descname">isSwingStarted</code><span class="sig-paren">(</span><em class="sig-param">motorPowers</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorControlPostProcessor.isSwingStarted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorControlPostProcessor.updateCountDerectionChangeDetectSwing">
+<code class="sig-name descname">updateCountDerectionChangeDetectSwing</code><span class="sig-paren">(</span><em class="sig-param">motorPowers</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorControlPostProcessor.updateCountDerectionChangeDetectSwing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="motorContl.MotorController">
+<em class="property">class </em><code class="sig-prename descclassname">motorContl.</code><code class="sig-name descname">MotorController</code><a class="headerlink" href="#motorContl.MotorController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="motorContl.MotorController.CORRECTION_VALUE_BALL_ANGLE_TO_SPEED">
+<code class="sig-name descname">CORRECTION_VALUE_BALL_ANGLE_TO_SPEED</code><em class="property"> = 3</em><a class="headerlink" href="#motorContl.MotorController.CORRECTION_VALUE_BALL_ANGLE_TO_SPEED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.CORRECTION_VALUE_DISTANCE_TO_SPEED">
+<code class="sig-name descname">CORRECTION_VALUE_DISTANCE_TO_SPEED</code><em class="property"> = 100</em><a class="headerlink" href="#motorContl.MotorController.CORRECTION_VALUE_DISTANCE_TO_SPEED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.CORRECTION_VALUE_EGOAL_ANGLE_TO_SPEED">
+<code class="sig-name descname">CORRECTION_VALUE_EGOAL_ANGLE_TO_SPEED</code><em class="property"> = 5</em><a class="headerlink" href="#motorContl.MotorController.CORRECTION_VALUE_EGOAL_ANGLE_TO_SPEED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.CORRECTION_VALUE_MGOAL_ANGLE_TO_SPEED">
+<code class="sig-name descname">CORRECTION_VALUE_MGOAL_ANGLE_TO_SPEED</code><em class="property"> = 6</em><a class="headerlink" href="#motorContl.MotorController.CORRECTION_VALUE_MGOAL_ANGLE_TO_SPEED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.DEBUG_CHASE_ALGORITHM">
+<code class="sig-name descname">DEBUG_CHASE_ALGORITHM</code><em class="property"> = 1</em><a class="headerlink" href="#motorContl.MotorController.DEBUG_CHASE_ALGORITHM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.DEBUG_SHOOT_ALGORITHM">
+<code class="sig-name descname">DEBUG_SHOOT_ALGORITHM</code><em class="property"> = 2</em><a class="headerlink" href="#motorContl.MotorController.DEBUG_SHOOT_ALGORITHM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.DIC_SETTING_TO_MOTOR_VALUE">
+<code class="sig-name descname">DIC_SETTING_TO_MOTOR_VALUE</code><em class="property"> = {'STOP': (0, 0)}</em><a class="headerlink" href="#motorContl.MotorController.DIC_SETTING_TO_MOTOR_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.K_CHASE_ANGLE">
+<code class="sig-name descname">K_CHASE_ANGLE</code><em class="property"> = 0.4</em><a class="headerlink" href="#motorContl.MotorController.K_CHASE_ANGLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.K_GO_CENTER_ANGLE">
+<code class="sig-name descname">K_GO_CENTER_ANGLE</code><em class="property"> = 0.25</em><a class="headerlink" href="#motorContl.MotorController.K_GO_CENTER_ANGLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.K_SHOOT_ANGLE">
+<code class="sig-name descname">K_SHOOT_ANGLE</code><em class="property"> = 0.4</em><a class="headerlink" href="#motorContl.MotorController.K_SHOOT_ANGLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.PARAMETER_CUSTOM_SECTION">
+<code class="sig-name descname">PARAMETER_CUSTOM_SECTION</code><em class="property"> = 'parameter'</em><a class="headerlink" href="#motorContl.MotorController.PARAMETER_CUSTOM_SECTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.PARAMETER_INI_PATH">
+<code class="sig-name descname">PARAMETER_INI_PATH</code><em class="property"> = '/home/pi/Desktop/raspi_FcTronto/webiopi/parameter.ini'</em><a class="headerlink" href="#motorContl.MotorController.PARAMETER_INI_PATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.SPEED_CHASE">
+<code class="sig-name descname">SPEED_CHASE</code><em class="property"> = 55</em><a class="headerlink" href="#motorContl.MotorController.SPEED_CHASE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.SPEED_DISTANCE_INFINITE">
+<code class="sig-name descname">SPEED_DISTANCE_INFINITE</code><em class="property"> = 25</em><a class="headerlink" href="#motorContl.MotorController.SPEED_DISTANCE_INFINITE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.SPEED_FRONT_BALL">
+<code class="sig-name descname">SPEED_FRONT_BALL</code><em class="property"> = 30</em><a class="headerlink" href="#motorContl.MotorController.SPEED_FRONT_BALL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.SPEED_FRONT_GOAL">
+<code class="sig-name descname">SPEED_FRONT_GOAL</code><em class="property"> = 25</em><a class="headerlink" href="#motorContl.MotorController.SPEED_FRONT_GOAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.SPEED_GO_CENTER">
+<code class="sig-name descname">SPEED_GO_CENTER</code><em class="property"> = 45</em><a class="headerlink" href="#motorContl.MotorController.SPEED_GO_CENTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.SPEED_NOTHING_TO_DO">
+<code class="sig-name descname">SPEED_NOTHING_TO_DO</code><em class="property"> = (5, -5)</em><a class="headerlink" href="#motorContl.MotorController.SPEED_NOTHING_TO_DO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.SPEED_SHOOT">
+<code class="sig-name descname">SPEED_SHOOT</code><em class="property"> = 55</em><a class="headerlink" href="#motorContl.MotorController.SPEED_SHOOT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.SPEED_STOP">
+<code class="sig-name descname">SPEED_STOP</code><em class="property"> = (0, 0)</em><a class="headerlink" href="#motorContl.MotorController.SPEED_STOP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.THRESHOLD_BALL_DETECT">
+<code class="sig-name descname">THRESHOLD_BALL_DETECT</code><em class="property"> = 0.05</em><a class="headerlink" href="#motorContl.MotorController.THRESHOLD_BALL_DETECT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.calcAndSendMotorPowers">
+<code class="sig-name descname">calcAndSendMotorPowers</code><span class="sig-paren">(</span><em class="sig-param">shmem</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.calcAndSendMotorPowers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.calcDiffRondOffWithin100">
+<code class="sig-name descname">calcDiffRondOffWithin100</code><span class="sig-paren">(</span><em class="sig-param">num</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.calcDiffRondOffWithin100" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.calcMotorPowers">
+<code class="sig-name descname">calcMotorPowers</code><span class="sig-paren">(</span><em class="sig-param">shmem</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.calcMotorPowers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.calcMotorPowersByBallAngle">
+<code class="sig-name descname">calcMotorPowersByBallAngle</code><span class="sig-paren">(</span><em class="sig-param">ballAngle</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.calcMotorPowersByBallAngle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.calcMotorPowersByBallAngleAndDis">
+<code class="sig-name descname">calcMotorPowersByBallAngleAndDis</code><span class="sig-paren">(</span><em class="sig-param">ballAngle</em>, <em class="sig-param">ballDis</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.calcMotorPowersByBallAngleAndDis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.calcMotorPowersByGoalAngle">
+<code class="sig-name descname">calcMotorPowersByGoalAngle</code><span class="sig-paren">(</span><em class="sig-param">eGoalAngle</em>, <em class="sig-param">mGoalAngle</em>, <em class="sig-param">fieldCenterAngle</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.calcMotorPowersByGoalAngle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.close">
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.getBallStateByDistance">
+<code class="sig-name descname">getBallStateByDistance</code><span class="sig-paren">(</span><em class="sig-param">distance</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.getBallStateByDistance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.getBallStateByTouch">
+<code class="sig-name descname">getBallStateByTouch</code><span class="sig-paren">(</span><em class="sig-param">isTouched</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.getBallStateByTouch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.getMotorPowerByDistance">
+<code class="sig-name descname">getMotorPowerByDistance</code><span class="sig-paren">(</span><em class="sig-param">distance</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.getMotorPowerByDistance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.getParameterSetting">
+<code class="sig-name descname">getParameterSetting</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.getParameterSetting" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.getSetting">
+<code class="sig-name descname">getSetting</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.getSetting" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.roundOffMotorSpeeds">
+<code class="sig-name descname">roundOffMotorSpeeds</code><span class="sig-paren">(</span><em class="sig-param">motorSpeeds</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.roundOffMotorSpeeds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.roundOffWithin100">
+<code class="sig-name descname">roundOffWithin100</code><span class="sig-paren">(</span><em class="sig-param">num</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.roundOffWithin100" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.MotorController.target">
+<code class="sig-name descname">target</code><span class="sig-paren">(</span><em class="sig-param">shmem</em><span class="sig-paren">)</span><a class="headerlink" href="#motorContl.MotorController.target" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 
