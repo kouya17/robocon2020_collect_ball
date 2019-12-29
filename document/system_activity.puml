@@ -1,7 +1,5 @@
-# UML diagrams
-## The whole system
-### Activity diagram
-```plantuml
+
+@startuml system_activity
 start
 if (has ball?) then (yes)
   :find the ball station by image processing;
@@ -21,4 +19,4 @@ else (no)
   endif
 endif
 end
-```
+@enduml
