@@ -1,35 +1,42 @@
 # coding: UTF-8
 
-import RPi.GPIO as GPIO
 import time
 from debug import ERROR, WARN, INFO, DEBUG, TRACE
+import Adafruit_PCA9685
 
 
 class Servo:
-    def __init__(self, pin_no):
-        TRACE('Servo generated pin=' + str(pin_no))
-        self._pin_no = pin_no
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self._pin_no, GPIO.OUT)
-        # PWMインスタンスを作成する。
-        # GPIO.PWM( [ピン番号] , [周波数Hz] )
-        # SG92RはPWMサイクル:20ms(=50Hz), 制御パルス:0.5ms〜2.4ms, (=2.5%〜12%)。
-        self._servo = GPIO.PWM(self._pin_no, 50)
-        # パルス出力開始。　servo.start( [デューティサイクル 0~100%] )
-        # とりあえずゼロ指定だとサイクルが生まれないので特に動かないっぽい？
-        #self._servo.start(7.25)
-        self._servo.start(0)
-        self._current_duty = 7.25
+    """
+
+    PCA9685 driver class
+
+    Examples:
+        >>> from servo import Servo
+        >>> adress = 0x41
+        >>> s = Servo(address, 325)
+        >>> Servo.write(150, 500, 3)
+
+    Attributes:
+        _address (int) : slave address
+        _pwm (Adafruit_PCA9685.PCA9685) : pwm control class
+        _current_pulse_length (int) : pulse length [us?]
+
+    """
+
+    def __init__(self, address, initial_pulse_length):
+        TRACE('Servo generated: address = ' + str(address))
+        self._address = address
+        self._pwm = Adafruit_PCA9685.PCA9685()
+        # Set frequency to 60hz, good for servos.
+        self._pwm.set_pwm_freq(60)
+        # Set initial pluse length
+        self._pwm.set_pwm(0, 0, initial_pulse_length)
+        self._current_pulse_length = initial_pulse_length
     
-    def write(self, target_duty, duration, diff_t):
+    def write(self, target_pulse_length, duration, diff_t):
         count = int(duration / diff_t)
         for i in range(count):
-            # デューティサイクルの値を変更することでサーボが回って角度が変わる。
-            self._servo.ChangeDutyCycle(self._current_duty + ((i + 1) * ((target_duty - self._current_duty) / count)))
+            self._pwm.set_pwm(0, 0, self._current_pulse_length + ((i + 1) * ((target_pulse_length - self._current_pulse_length) / count)))
             time.sleep(diff_t)
         
-        self._current_duty = target_duty
-    
-    def __del__(self):
-        self._servo.stop()
-        GPIO.cleanup()
+        self._current_pulse_length = target_pulse_length

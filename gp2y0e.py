@@ -10,9 +10,10 @@ class Gp2y0e:
     GP2Y0E driver class
 
     Examples:
+        >>> from gp2y0e import Gp2y0e
         >>> address = 0x40
         >>> g = Gp2y0e(address)
-        >>> print(g.read)
+        >>> print(g.read())
         10.7
     
     Attributes:
