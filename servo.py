@@ -26,7 +26,7 @@ class Servo:
     def __init__(self, address, initial_pulse_length):
         TRACE('Servo generated: address = ' + str(address))
         self._address = address
-        self._pwm = Adafruit_PCA9685.PCA9685()
+        self._pwm = Adafruit_PCA9685.PCA9685(address=address)
         # Set frequency to 60hz, good for servos.
         self._pwm.set_pwm_freq(60)
         # Set initial pluse length
