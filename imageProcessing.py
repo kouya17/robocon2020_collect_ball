@@ -16,7 +16,7 @@ class ImageProcessing:
     # 画像出力の有効無効
     ENABLE = 1
     DISABLE = 0
-    DEBUG_IMSHOW = ENABLE
+    DEBUG_IMSHOW = DISABLE
 
     BLUE_HSV_RANGE_MIN = [55, 70, 10]
     BLUE_HSV_RANGE_MAX = [120, 150, 80]
@@ -60,7 +60,7 @@ class ImageProcessing:
         mask1 = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
 
         # 赤色のHSVの値域2
-        hsv_range_min = np.array([150, 200, 80])
+        hsv_range_min = np.array([150, 150, 80])
         hsv_range_max = np.array([179, 255, 255])
         mask2 = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
         mask = mask1 + mask2
@@ -69,7 +69,7 @@ class ImageProcessing:
 
         if self.DEBUG_IMSHOW == self.ENABLE:
             #cv2.imshow('Mask' + color_name, mask.transpose((1, 0)))
-            cv2.imshow('Mask' + color_name, mask)
+            cv2.imshow('Mask' + color_name, cv2.flip(mask, -1))
 
         _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -264,6 +264,7 @@ class ImageProcessing:
         field_cx = field_cx_t
         field_cy = field_cy_t
         '''
+        red_cy = -red_cy
 
         '''
         yellow_goal_angle, yellow_goal_distance = self.calcBallDirection(yellow_cx, yellow_cy, yellow_area_size)
@@ -300,7 +301,8 @@ class ImageProcessing:
                     
                     if self.DEBUG_IMSHOW == self.ENABLE:
                         #cv2.imshow('Frame', stream.array.transpose((1, 0, 2)))
-                        cv2.imshow('Frame', stream.array)
+                        cv2.imshow('Frame', cv2.flip(stream.array, -1))
+                        #cv2.imshow('Frame', stream.array)
                         cv2.moveWindow('Frame', 0, 30)
                         cv2.moveWindow('MaskRed', 482, 30)
                         #cv2.moveWindow('MaskYellow', 482, 30)

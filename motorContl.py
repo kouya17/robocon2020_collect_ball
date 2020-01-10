@@ -75,7 +75,8 @@ class MotorController:
         # モータドライバ制御用インスタンス生成
         self.left_motor = MiniMotorDriver(0x60)
         self.right_motor = MiniMotorDriver(0x65)
-        self.servo = Servo(4)
+        self.servo = Servo(0x41)
+        self.servo.up()
         # 設定値読み込み
         #self.getParameterSetting()
 
