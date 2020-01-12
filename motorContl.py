@@ -50,7 +50,7 @@ class MotorController:
     # シュート時の比例項の係数
     K_SHOOT_ANGLE = 0.4  # SPEED_SHOOT / 180にするとよい？
     # ボール追跡時の基準スピード
-    SPEED_CHASE = 55
+    SPEED_CHASE = 10
     # ボール追跡時の比例項の係数
     K_CHASE_ANGLE = 0.4  # SPEED_CHASE / 180にするとよい？
 
@@ -73,8 +73,8 @@ class MotorController:
         # モータ制御後処理インスタンス生成
         self.motorControlPostProcessor = MotorControlPostProcessor()
         # モータドライバ制御用インスタンス生成
-        self.left_motor = MiniMotorDriver(0x60)
-        self.right_motor = MiniMotorDriver(0x65)
+        self.left_motor = MiniMotorDriver(0x65)
+        self.right_motor = MiniMotorDriver(0x60)
         self.servo = Servo(0x41)
         self.servo.up()
         # 設定値読み込み
