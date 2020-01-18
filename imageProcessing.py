@@ -16,7 +16,7 @@ class ImageProcessing:
     # 画像出力の有効無効
     ENABLE = 1
     DISABLE = 0
-    DEBUG_IMSHOW = ENABLE
+    DEBUG_IMSHOW = DISABLE
 
     BLUE_HSV_RANGE_MIN = [55, 70, 10]
     BLUE_HSV_RANGE_MAX = [120, 150, 80]
@@ -56,15 +56,15 @@ class ImageProcessing:
         #if color_name == 'RED':
         # 赤色のHSVの値域1
         hsv_range_min = np.array([0, 64, 0])
-        hsv_range_max = np.array([0, 255, 255])
+        hsv_range_max = np.array([30, 255, 255])
         mask1 = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
 
         # 赤色のHSVの値域2
-        hsv_range_min = np.array([150, 64, 0])
+        hsv_range_min = np.array([160, 64, 0])
         hsv_range_max = np.array([179, 255, 255])
         mask2 = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
         mask = mask1 + mask2
-        # mask = mask2
+        #mask = mask2
         # mask = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
         #mask = cv2.bitwise_and(mask, mask, mask=mask_0)
 
@@ -206,7 +206,7 @@ class ImageProcessing:
         '''
 
         ball_angle = cx - self.CAMERA_CENTER_CX
-        ball_distance = 10
+        ball_distance = cy + 240
         
         return int(ball_angle), int(ball_distance)
 
@@ -297,6 +297,7 @@ class ImageProcessing:
                     #yellow_goal_angle, yellow_goal_distance, blue_goal_angle, blue_goal_distance, field_center_angle, field_center_distance = self.imageProcessingFrame(stream.array, shmem)
                     red_ball_angle, red_ball_distance = self.imageProcessingFrame(stream.array, shmem)
 
+                    DEBUG('red ball: angle =' + str(red_ball_angle).rjust(5) + ', distance = ' + str(red_ball_distance).rjust(5))
                     # 結果表示
                     # 画角の前後左右と画像表示の上下左右を揃えるために画像を転置する。
                     

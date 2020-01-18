@@ -7,6 +7,7 @@ from miniMotorDriver import MiniMotorDriver
 from servo import Servo
 import os
 import configparser
+from gp2y0e import Gp2y0e
 
 # ボール保持状態用列挙型
 class BallStateE(Enum):
@@ -50,7 +51,7 @@ class MotorController:
     # シュート時の比例項の係数
     K_SHOOT_ANGLE = 0.4  # SPEED_SHOOT / 180にするとよい？
     # ボール追跡時の基準スピード
-    SPEED_CHASE = 10
+    SPEED_CHASE = 20
     # ボール追跡時の比例項の係数
     K_CHASE_ANGLE = 0.4  # SPEED_CHASE / 180にするとよい？
 
@@ -72,6 +73,8 @@ class MotorController:
         self.is_dribble_started = False
         # モータ制御後処理インスタンス生成
         self.motorControlPostProcessor = MotorControlPostProcessor()
+        # 距離センサ用インスタンス生成
+        self.distanceSensor = Gp2y0e(0x40)
         # モータドライバ制御用インスタンス生成
         self.left_motor = MiniMotorDriver(0x65)
         self.right_motor = MiniMotorDriver(0x60)
@@ -358,11 +361,26 @@ class MotorController:
             # ボール状態取得
             #ballState = self.getBallStateByTouch(shmem.isTouched)
             #DEBUG('ballState = ', ballState)
+            
+            # ボール捕獲に移る
+            if 110 < shmem.ballDis < 120:
+                self.left_motor.drive(0)
+                self.right_motor.drive(0)
+                self.servo.down()
+                while 1:
+                    distanceSensorValue = self.distanceSensor.read()
+                    DEBUG('distanceSensor = ' + str(distanceSensorValue))
+                    if distanceSensorValue > 15:
+                        self.servo.up()
+                        break
+                    time.sleep(1)
+
+
             # モータ値計算
             #motorPowers = self.calcMotorPowers(ballState, shmem)
             motorPowers = self.calcMotorPowers(shmem)
             # モーター値後処理(現在は首振り検知処理のみ)
-            motorPowers = self.motorControlPostProcessor.escapeSwing(motorPowers)
+            #motorPowers = self.motorControlPostProcessor.escapeSwing(motorPowers)
             # 設定ファイルの内容を反映
             #setting = self.getSetting()
             #if setting != 'NONE':
