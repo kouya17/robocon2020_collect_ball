@@ -37,7 +37,7 @@ DEBUG_DISABLE = 0
 DEBUG_ENABLE = 1
 
 # ログ出力のレベルを指定
-DEBUG_LEVEL = DEBUG_LEVEL_ALL
+DEBUG_LEVEL = DEBUG_LEVEL_OFF
 
 
 def dummyFunc(level, *args):
