@@ -9,10 +9,10 @@ import os
 import configparser
 from gp2y0e import Gp2y0e
 
-# ボール保持状態用列挙型
-class BallStateE(Enum):
-    HAVE_BALL = 0
-    NOT_HAVE_BALL = 1
+# 状態用列挙型
+class MotionStateE(Enum):
+    CHASE_BALL = 0
+    GO_TO_STATION = 1
 
 # モータ制御用クラス
 class MotorController:
@@ -82,6 +82,8 @@ class MotorController:
         self.servo.up()
         # 設定値読み込み
         #self.getParameterSetting()
+        # 動作状態初期化
+        self.motion_status = MotionStateE.CHASE_BALL
 
     def getParameterSetting(self):
         # パラメータ値設定ファイルを読み込み
@@ -329,7 +331,7 @@ class MotorController:
             return MotorController.SPEED_STOP
     
     # モータの値を計算する
-    def calcMotorPowers(self, shmem):
+    def calcMotorPowers(self, shmem, motion_status):
         # ボール保持状態の場合
         # 画像処理結果を使ってゴールへ向かう
         #return self.calcMotorPowersByGoalAngle(shmem.enemyGoalAngle, shmem.myGoalAngle, shmem.fieldCenterAngle)
@@ -337,7 +339,10 @@ class MotorController:
         # 赤外線センサと距離センサの情報を使ってボールへ向かう
         #return self.calcMotorPowersByBallAngleAndDis(shmem.irAngle, shmem.uSonicDis)
         # 距離センサは使用しない
-        return self.calcMotorPowersByBallAngle(shmem.ballAngle)
+        if motion_status == MotionStateE.CHASE_BALL:
+            return self.calcMotorPowersByBallAngle(shmem.ballAngle)
+        
+        return self.calcMotorPowersByBallAngle(shmem.stationAngle)
     
     def getSetting(self):
         # モータ値設定ファイルを読み込み
@@ -362,23 +367,30 @@ class MotorController:
             #ballState = self.getBallStateByTouch(shmem.isTouched)
             #DEBUG('ballState = ', ballState)
             
-            # ボール捕獲に移る
-            if 110 < shmem.ballDis < 120:
-                self.left_motor.drive(0)
-                self.right_motor.drive(0)
-                self.servo.down()
-                while 1:
-                    distanceSensorValue = self.distanceSensor.read()
-                    DEBUG('distanceSensor = ' + str(distanceSensorValue))
-                    if distanceSensorValue > 15:
-                        self.servo.up()
-                        break
-                    time.sleep(1)
-
-
+            if self.motion_status == MotionStateE.CHASE_BALL:
+                # ボール捕獲に移る
+                if 110 < shmem.ballDis < 120:
+                    self.left_motor.drive(0)
+                    self.right_motor.drive(0)
+                    self.servo.down()
+                    self.motion_status = MotionStateE.GO_TO_STATION
+            elif self.motion_status == MotionStateE.GO_TO_STATION:
+                distanceSensorValue = self.distanceSensor.read()
+                DEBUG('distanceSensor = ' + str(distanceSensorValue))
+                # ボール消失してる
+                if distanceSensorValue > 15:
+                    self.servo.up()
+                    self.motion_status = MotionStateE.CHASE_BALL
+                # TODO: ステーション到着後の動き
+                if 110 < shmem.stationDis < 200:
+                    self.left_motor.drive(0)
+                    self.right_motor.drive(0)
+                    self.servo.up()
+                    self.motion_status = MotionStateE.CHASE_BALL
+            
             # モータ値計算
             #motorPowers = self.calcMotorPowers(ballState, shmem)
-            motorPowers = self.calcMotorPowers(shmem)
+            motorPowers = self.calcMotorPowers(shmem, self.motion_status)
             # モーター値後処理(現在は首振り検知処理のみ)
             #motorPowers = self.motorControlPostProcessor.escapeSwing(motorPowers)
             # 設定ファイルの内容を反映

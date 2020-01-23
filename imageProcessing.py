@@ -18,9 +18,9 @@ class ImageProcessing:
     DISABLE = 0
     DEBUG_IMSHOW = ENABLE
 
-    RED_HSV_RANGE_MIN_1 = [0, 70, 0]
-    RED_HSV_RANGE_MAX_1 = [30, 255, 255]
-    RED_HSV_RANGE_MIN_2 = [160, 70, 0]
+    RED_HSV_RANGE_MIN_1 = [0, 120, 30]
+    RED_HSV_RANGE_MAX_1 = [10, 255, 255]
+    RED_HSV_RANGE_MIN_2 = [160, 120, 30]
     RED_HSV_RANGE_MAX_2 = [179, 255, 255]
     BLUE_HSV_RANGE_MIN = [55, 70, 10]
     BLUE_HSV_RANGE_MAX = [120, 150, 80]
@@ -148,7 +148,7 @@ class ImageProcessing:
     # @param cx 領域のx座標
     # @param cy 領域のy座標
     # @param area_size 領域の面積
-    def calcBallDirection(self, cx, cy, area_size):
+    def calcBallDirection(self, cx, cy):
         ball_angle = cx - self.CAMERA_CENTER_CX
         ball_distance = cy + 240
         
@@ -186,9 +186,10 @@ class ImageProcessing:
         red_cy = -red_cy
         yellow_cy = -yellow_cy
 
-        red_ball_angle, red_ball_distance = self.calcBallDirection(red_cx, red_cy, red_area_size)
+        red_ball_angle, red_ball_distance = self.calcBallDirection(red_cx, red_cy)
+        station_angle, station_distance = self.calcBallDirection(yellow_cx, yellow_cy)
 
-        return red_ball_angle, red_ball_distance
+        return red_ball_angle, red_ball_distance, station_angle, station_distance
 
     # @brief 画像処理のmain処理
     # @param shmem 共有メモリ
@@ -204,9 +205,10 @@ class ImageProcessing:
                     # 画像を取得し、stream.arrayにRGBの順で映像データを格納
                     camera.capture(stream, 'bgr', use_video_port=True)
 
-                    red_ball_angle, red_ball_distance = self.imageProcessingFrame(stream.array, shmem)
+                    red_ball_angle, red_ball_distance, station_angle, station_distance = self.imageProcessingFrame(stream.array, shmem)
 
                     DEBUG('red ball: angle =' + str(red_ball_angle).rjust(5) + ', distance = ' + str(red_ball_distance).rjust(5))
+                    DEBUG('station: angle =' + str(station_angle).rjust(5) + ', distance = ' + str(station_distance).rjust(5))
                     
                     # 結果表示
                     # 画角の前後左右と画像表示の上下左右を揃えるために画像を転置する。
@@ -219,6 +221,8 @@ class ImageProcessing:
                     # 共有メモリに書き込む
                     shmem.ballAngle = int(red_ball_angle * 90 / 240)
                     shmem.ballDis = int(red_ball_distance)
+                    shmem.stationAngle = int(station_angle * 90 / 240)
+                    shmem.stationDis = int(station_distance)
 
                     # "q"でウィンドウを閉じる
                     if cv2.waitKey(1) & 0xFF == ord("q"):
