@@ -8,6 +8,12 @@ from imageProcessing import ImageProcessing
 from imu import Imu
 from debug import ERROR, WARN, INFO, DEBUG, TRACE
 
+"""
+
+main module
+
+"""
+
 
 # 共有メモリの構造体
 class Point(Structure):

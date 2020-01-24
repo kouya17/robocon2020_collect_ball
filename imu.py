@@ -4,6 +4,7 @@ import FaBo9Axis_MPU9250
 import time
 from debug import DEBUG, TRACE
 
+
 class Imu:
     """
     
@@ -34,7 +35,7 @@ class Imu:
         while 1:
             gyro = self._mpu9250.readGyro()
             self._degree += gyro["z"] - self._epsilon
-            shmem.bodyAngle = self._degree
+            shmem.bodyAngle = int(self._degree)
             DEBUG('bodyAngle = ', shmem.bodyAngle)
             time.sleep(self._update_interval_sec)
             

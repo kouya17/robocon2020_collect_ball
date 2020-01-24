@@ -1,6 +1,11 @@
 from servo import Servo
 import time
 
+"""
+
+test program for servo driver
+
+"""
 
 if __name__ == "__main__":
     servo = Servo(4)

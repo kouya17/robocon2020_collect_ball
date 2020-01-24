@@ -9,6 +9,14 @@ import cv2
 import time
 import glob
 
+
+"""
+
+unit test for imageProcessing.py
+
+"""
+
+
 class TestPoint(Structure):
     _fields_ = [('ballAngle', c_int), ('ballDis', c_int)]
 
@@ -34,4 +42,3 @@ if __name__ == '__main__':
     cv2.waitKey(0)
 
     cv2.destroyAllWindows()
-

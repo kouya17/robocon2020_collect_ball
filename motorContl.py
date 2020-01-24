@@ -9,6 +9,14 @@ import os
 import configparser
 from gp2y0e import Gp2y0e
 
+
+"""
+
+motor controle module
+
+"""
+
+
 # 状態用列挙型
 class MotionStateE(Enum):
     CHASE_BALL = 0
@@ -26,10 +34,6 @@ class MotorController:
     THRESHOLD_BALL_DETECT = 0.05
     # ボールとの角度からモータ速度変換時の補正値
     CORRECTION_VALUE_BALL_ANGLE_TO_SPEED = 3
-    # 敵陣ゴールとの角度からモータ速度変換時の補正値
-    CORRECTION_VALUE_EGOAL_ANGLE_TO_SPEED = 5
-    # 自陣ゴールとの角度からモータ速度変換時の補正値
-    CORRECTION_VALUE_MGOAL_ANGLE_TO_SPEED = 6
     # ボールとの距離からモータ速度変換時の補正値
     CORRECTION_VALUE_DISTANCE_TO_SPEED = 100
     # 距離センサの値がinfinityの時のモータの値
@@ -46,24 +50,10 @@ class MotorController:
     DIC_SETTING_TO_MOTOR_VALUE = {'STOP' : (0, 0)}
 
     # 移動アルゴリズム1, 2で使用
-    # シュート時の基準スピード
-    SPEED_SHOOT = 55
-    # シュート時の比例項の係数
-    K_SHOOT_ANGLE = 0.4  # SPEED_SHOOT / 180にするとよい？
     # ボール追跡時の基準スピード
     SPEED_CHASE = 20
     # ボール追跡時の比例項の係数
     K_CHASE_ANGLE = 0.4  # SPEED_CHASE / 180にするとよい？
-
-    # 移動アルゴリズム2で使用
-    # フィールド中央復帰時の基準スピード
-    SPEED_GO_CENTER = 45
-    # フィールド中央復帰時の比例項の係数
-    K_GO_CENTER_ANGLE = 0.25  # SPEED_GO_CENTER / 180にするとよい？
-
-    # 設定ファイル情報
-    PARAMETER_INI_PATH = '/home/pi/Desktop/raspi_FcTronto/webiopi/parameter.ini'
-    PARAMETER_CUSTOM_SECTION = 'parameter'
 
     # コンストラクタ
     def __init__(self):
@@ -80,79 +70,8 @@ class MotorController:
         self.right_motor = MiniMotorDriver(0x60)
         self.servo = Servo(0x41)
         self.servo.up()
-        # 設定値読み込み
-        #self.getParameterSetting()
         # 動作状態初期化
         self.motion_status = MotionStateE.CHASE_BALL
-
-    def getParameterSetting(self):
-        # パラメータ値設定ファイルを読み込み
-        config = configparser.SafeConfigParser()
-        config.read(MotorController.PARAMETER_INI_PATH)
-
-        self.DEBUG_SHOOT_ALGORITHM = int(config.get(MotorController.PARAMETER_CUSTOM_SECTION, 'shoot_algo'))
-        self.DEBUG_CHASE_ALGORITHM = int(config.get(MotorController.PARAMETER_CUSTOM_SECTION, 'chase_algo'))
-        MotorController.SPEED_SHOOT = int(config.get(MotorController.PARAMETER_CUSTOM_SECTION, 'shoot_speed'))
-        MotorController.K_SHOOT_ANGLE = float(config.get(MotorController.PARAMETER_CUSTOM_SECTION, 'k_shoot_angle'))
-        MotorController.SPEED_CHASE = int(config.get(MotorController.PARAMETER_CUSTOM_SECTION, 'chase_speed'))
-        MotorController.K_CHASE_ANGLE = float(config.get(MotorController.PARAMETER_CUSTOM_SECTION, 'k_chase_angle'))
-        MotorController.SPEED_GO_CENTER = int(config.get(MotorController.PARAMETER_CUSTOM_SECTION, 'center_speed'))
-        MotorController.K_GO_CENTER_ANGLE = float(config.get(MotorController.PARAMETER_CUSTOM_SECTION, 'k_center_angle'))
-        INFO('------- motor control parameter read -------')
-        INFO('shoot_algo=' + str(self.DEBUG_SHOOT_ALGORITHM).rjust(3) + ',',
-                 'chase_algo=' + str(self.DEBUG_CHASE_ALGORITHM).rjust(3) + ',',
-                 'shoot=' + str(MotorController.SPEED_SHOOT).rjust(4) + ',' + str(MotorController.K_SHOOT_ANGLE).rjust(4) + ',',
-                 'chase=' + str(MotorController.K_CHASE_ANGLE).rjust(4) + ',' + str(MotorController.K_CHASE_ANGLE).rjust(4) + ',',
-                 'center=' + str(MotorController.SPEED_GO_CENTER).rjust(4) + ',' + str(MotorController.K_GO_CENTER_ANGLE).rjust(4)
-                 )
-
-    # 距離センサの値から現在のボール状態を取得する
-    def getBallStateByDistance(self, distance):
-        # すでにドリブル状態に入っていた場合
-        if self.is_dribble_started:
-            # 距離センサの値がinfinityの時もボール保持状態と判断する
-            # (距離センサにボールが近づきすぎても値がinifinityになるため)
-            if distance < MotorController.THRESHOLD_BALL_DETECT or distance == 100:
-                return BallStateE.HAVE_BALL
-            else:
-                # 距離センサの値が閾値より大きくなっていたらドリブル状態は解除
-                self.is_dribble_started = False
-                DEBUG('dribble END')
-                return BallStateE.NOT_HAVE_BALL
-        # ドリブル状態に入っていない場合
-        else:
-            # 距離センサの値が閾値より小さかったらボール保持状態と判断
-            # ドリブル状態に入る
-            if distance < MotorController.THRESHOLD_BALL_DETECT:
-                self.is_dribble_started = True
-                DEBUG('dribble START')
-                return BallStateE.HAVE_BALL
-            else:
-                return BallStateE.NOT_HAVE_BALL
-    
-    # タッチセンサの値から現在のボール状態を取得する
-    def getBallStateByTouch(self, isTouched):
-        # タッチされてない
-        if isTouched == 0:
-            TRACE('ball state : not touched')
-            return BallStateE.NOT_HAVE_BALL
-        # タッチされてる
-        elif isTouched == 1:
-            TRACE('ball state : touched')
-            return BallStateE.HAVE_BALL
-        # 不正値
-        else:
-            WARN('ball state : invalid value (isTouched)')
-            return BallStateE.NOT_HAVE_BALL
-
-    # ボールとの距離からモータの値を計算する
-    def getMotorPowerByDistance(self, distance):
-        # 距離センサの値がinfinityの場合は固定値
-        if distance == 100:
-            motorPower = MotorController.SPEED_DISTANCE_INFINITE
-        else:
-            motorPower = int(distance * MotorController.CORRECTION_VALUE_DISTANCE_TO_SPEED)
-        return motorPower, motorPower
 
     # 数値の絶対値を100に丸める
     def roundOffWithin100(self, num):
@@ -197,90 +116,6 @@ class MotorController:
             TRACE('both power abs under 100')
             return returnSpeeds
 
-    # ゴール情報を使ってモータの値を計算する
-    def calcMotorPowersByGoalAngle(self, eGoalAngle, mGoalAngle, fieldCenterAngle):
-        if self.DEBUG_SHOOT_ALGORITHM == 0:
-            # ゴールが正面にある場合
-            if abs(eGoalAngle) < 10:
-                TRACE('calcMotor patern : enemyGoalAngle = 0')
-                # 前進
-                return MotorController.SPEED_FRONT_GOAL, MotorController.SPEED_FRONT_GOAL
-            # ゴールが正面にない場合
-            elif -180 < eGoalAngle < 180:
-                TRACE('calcMotor patern : -180 < enemyGoalAngle < 180')
-                # モータの値は補正をかける
-                speed = eGoalAngle / MotorController.CORRECTION_VALUE_EGOAL_ANGLE_TO_SPEED
-                # 絶対値が100を超える場合は100に丸める
-                #speed = self.roundOffWithin100(speed)
-                return (-speed), speed
-            # ゴールとの角度が不正値の場合
-            else:
-                # 自分のゴールの角度を使う
-                # 自分のゴールとの角度が取れている場合
-                if -180 < mGoalAngle < 180:
-                    TRACE('calcMotor patern : -180 < mGoalAngle < 180')
-                    # とりあえず自軍のゴールの方向に旋回するのは危険そうなので逆に旋回する
-                    # モータの値は補正をかける
-                    speed = mGoalAngle / MotorController.CORRECTION_VALUE_MGOAL_ANGLE_TO_SPEED
-                    # 絶対値が100を超える場合は100に丸める
-                    #speed = self.roundOffWithin100(speed)
-                    return speed, (-speed)
-                # 自分のゴールとの角度も不正値の場合
-                else:
-                    TRACE('calcMotor patern : cannot detect goal')
-                    # どうしようもない時用の値を使う
-                    return MotorController.SPEED_NOTHING_TO_DO
-        elif self.DEBUG_SHOOT_ALGORITHM == 1:
-            # ゴールが正面にある場合
-            # P制御
-            if -180 < eGoalAngle < 180:
-                TRACE('calcMotor patern : -180 < enemyGoalAngle < 180')
-                # ゴール角度が正面からずれるほどたくさん曲がる
-                return MotorController.SPEED_SHOOT - MotorController.K_SHOOT_ANGLE * eGoalAngle,\
-                       MotorController.SPEED_SHOOT + MotorController.K_SHOOT_ANGLE * eGoalAngle
-            # ゴールとの角度が不正値の場合
-            else:
-                # 自分のゴールの角度を使う
-                # 自分のゴールとの角度が取れている場合
-                if -180 < mGoalAngle < 180:
-                    TRACE('calcMotor patern : -180 < mGoalAngle < 180')
-                    # とりあえず自軍のゴールの方向に旋回するのは危険そうなので逆に旋回する
-                    # モータの値は補正をかける
-                    speed = mGoalAngle / MotorController.CORRECTION_VALUE_MGOAL_ANGLE_TO_SPEED
-                    # 絶対値が100を超える場合は100に丸める
-                    #speed = self.roundOffWithin100(speed)
-                    return speed, (-speed)
-                # 自分のゴールとの角度も不正値の場合
-                else:
-                    TRACE('calcMotor patern : cannot detect goal')
-                    # どうしようもない時用の値を使う
-                    return MotorController.SPEED_NOTHING_TO_DO
-        elif self.DEBUG_SHOOT_ALGORITHM == 2:
-            # ゴールが正面にある場合
-            # P制御
-            if -180 < eGoalAngle < 180:
-                TRACE('calcMotor patern : -180 < enemyGoalAngle < 180')
-                # ゴール角度が正面からずれるほどたくさん曲がる
-                return MotorController.SPEED_SHOOT - MotorController.K_SHOOT_ANGLE * eGoalAngle,\
-                       MotorController.SPEED_SHOOT + MotorController.K_SHOOT_ANGLE * eGoalAngle
-            # ゴールとの角度が不正値の場合
-            else:
-                # フィールド中央との角度を使う
-                # フィールド中央との角度が取れている場合
-                if -180 < fieldCenterAngle < 180:
-                    TRACE('calcMotor patern : -180 < fieldCenterAngle < 180')
-                    # ゴール角度が正面からずれるほどたくさん曲がる
-                    return MotorController.SPEED_GO_CENTER - MotorController.K_GO_CENTER_ANGLE * fieldCenterAngle, \
-                           MotorController.SPEED_GO_CENTER + MotorController.K_GO_CENTER_ANGLE * fieldCenterAngle
-                # 自分のゴールとの角度も不正値の場合
-                else:
-                    TRACE('calcMotor patern : cannot detect goal and center')
-                    # どうしようもない時用の値を使う
-                    return MotorController.SPEED_NOTHING_TO_DO
-        else:
-            ERROR('Invalid Value : DEBUG_SHOOT_ALGORITHM =', self.DEBUG_SHOOT_ALGORITHM)
-            return MotorController.SPEED_STOP
-
     # ボール情報を使ってモータの値を計算する
     def calcMotorPowersByBallAngleAndDis(self, ballAngle, ballDis):
         if self.DEBUG_CHASE_ALGORITHM == 0:
@@ -302,9 +137,8 @@ class MotorController:
         if self.DEBUG_CHASE_ALGORITHM == 1:
             # P制御
             return MotorController.SPEED_CHASE - MotorController.K_CHASE_ANGLE * ballAngle, \
-                   MotorController.SPEED_CHASE + MotorController.K_CHASE_ANGLE * ballAngle
+                MotorController.SPEED_CHASE + MotorController.K_CHASE_ANGLE * ballAngle
 
-    
     # ボールとの角度のみを使ってモータの値を計算する
     def calcMotorPowersByBallAngle(self, ballAngle):
         if self.DEBUG_CHASE_ALGORITHM == 0:
@@ -318,61 +152,34 @@ class MotorController:
                 TRACE('calcMotor patern : boalAngle != 0')
                 # モータの値は補正をかける
                 speed = ballAngle / MotorController.CORRECTION_VALUE_BALL_ANGLE_TO_SPEED
-                # 絶対値が100を超える場合は100に丸める
-                #speed = self.roundOffWithin100(speed)
                 # left, rightの順で返却
                 return speed, (-speed)
         elif self.DEBUG_CHASE_ALGORITHM == 1:
             # P制御
             return MotorController.SPEED_CHASE + MotorController.K_CHASE_ANGLE * ballAngle, \
-                   MotorController.SPEED_CHASE - MotorController.K_CHASE_ANGLE * ballAngle
+                MotorController.SPEED_CHASE - MotorController.K_CHASE_ANGLE * ballAngle
         else:
             ERROR('Invalid Value : DEBUG_CHASE_ALGORITHM =', self.DEBUG_CHASE_ALGORITHM)
             return MotorController.SPEED_STOP
     
     # モータの値を計算する
     def calcMotorPowers(self, shmem, motion_status):
-        # ボール保持状態の場合
-        # 画像処理結果を使ってゴールへ向かう
-        #return self.calcMotorPowersByGoalAngle(shmem.enemyGoalAngle, shmem.myGoalAngle, shmem.fieldCenterAngle)
-
-        # 赤外線センサと距離センサの情報を使ってボールへ向かう
-        #return self.calcMotorPowersByBallAngleAndDis(shmem.irAngle, shmem.uSonicDis)
-        # 距離センサは使用しない
+        # 現在の状態に応じて追跡対象を変える
         if motion_status == MotionStateE.CHASE_BALL:
             return self.calcMotorPowersByBallAngle(shmem.ballAngle)
         
         return self.calcMotorPowersByBallAngle(shmem.stationAngle)
-    
-    def getSetting(self):
-        # モータ値設定ファイルを読み込み
-        try:
-            with open('/home/pi/Desktop/raspi_FcTronto/webiopi/motor_setting.txt') as f:
-                motorSetting = f.read()
-                if motorSetting != '':
-                    DEBUG('motor setting = ', motorSetting)
-                    return motorSetting
-                else:
-                    TRACE('motor setting is NONE')
-                    return 'NONE'
-        # ファイル読み込み失敗
-        except:
-            WARN('motor setting file read failure')
-            return 'NONE'
 
     # モータの値を計算しドライバへ送る
     def calcAndSendMotorPowers(self, shmem):
         while 1:
-            # ボール状態取得
-            #ballState = self.getBallStateByTouch(shmem.isTouched)
-            #DEBUG('ballState = ', ballState)
-            
             if self.motion_status == MotionStateE.CHASE_BALL:
                 # ボール捕獲に移る
-                if 110 < shmem.ballDis < 120:
+                if 100 < shmem.ballDis < 130:
                     self.left_motor.drive(0)
                     self.right_motor.drive(0)
                     self.servo.down()
+                    time.sleep(5)
                     self.motion_status = MotionStateE.GO_TO_STATION
             elif self.motion_status == MotionStateE.GO_TO_STATION:
                 distanceSensorValue = self.distanceSensor.read()
@@ -382,40 +189,26 @@ class MotorController:
                     self.servo.up()
                     self.motion_status = MotionStateE.CHASE_BALL
                 # TODO: ステーション到着後の動き
-                if 110 < shmem.stationDis < 200:
+                if 300 < shmem.stationDis < 330:
                     self.left_motor.drive(0)
                     self.right_motor.drive(0)
                     self.servo.up()
                     self.motion_status = MotionStateE.CHASE_BALL
             
             # モータ値計算
-            #motorPowers = self.calcMotorPowers(ballState, shmem)
             motorPowers = self.calcMotorPowers(shmem, self.motion_status)
             # モーター値後処理(現在は首振り検知処理のみ)
             #motorPowers = self.motorControlPostProcessor.escapeSwing(motorPowers)
-            # 設定ファイルの内容を反映
-            #setting = self.getSetting()
-            #if setting != 'NONE':
-            #    motorPowers = MotorController.DIC_SETTING_TO_MOTOR_VALUE.get(setting)
             # モータ値を正常値にまるめる
             motorPowers = self.roundOffMotorSpeeds(motorPowers)
-            # 送信伝文生成
-            #sendText = str(int(motorPowers[0])) + "," + str(int(motorPowers[1])) + "\n"
             # モータ値送信
-            #serial.write(sendText)
             self.left_motor.drive(motorPowers[0])
             self.right_motor.drive(motorPowers[1])
             # とりあえず一定時間間隔で動かす
-            #INFO('ball=' + str(ballState).rjust(15),
             INFO('motor l=' + str(motorPowers[0]).rjust(4) + ', r=' + str(motorPowers[1]).rjust(4),
-            #     'IR=' + str(shmem.irAngle).rjust(4),
-            #     'touch=' + str(shmem.isTouched).rjust(4),
-            #     'enemy=' + str(shmem.enemyGoalAngle).rjust(4) + ',' + str(shmem.enemyGoalDis).rjust(4),
-            #     'my=' + str(shmem.myGoalAngle).rjust(4) + ',' + str(shmem.myGoalDis).rjust(4),
-            #     'center=' + str(shmem.fieldCenterAngle).rjust(4) + ',' + str(shmem.fieldCenterDis).rjust(4),
                  'ball=' + str(shmem.ballAngle).rjust(4) + ',' + str(shmem.ballDis).rjust(4),
                  )
-            time.sleep(0.5)
+            time.sleep(0.1)
     
     # 起動処理
     def target(self, shmem):
@@ -425,6 +218,7 @@ class MotorController:
     # 停止処理(仮)
     def close():
         pass
+
 
 class MotorControlPostProcessor:
     # モータ制御後処理パラメータ群

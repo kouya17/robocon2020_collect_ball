@@ -148,54 +148,68 @@
   <div class="section" id="module-debug">
 <span id="debug-module"></span><h1>debug module<a class="headerlink" href="#module-debug" title="Permalink to this headline">¶</a></h1>
 <p>How to use</p>
-<p>1. debug printを使用したいファイルで以下のようにimportする。
-from debug import ERROR, WARN, INFO, DEBUG, TRACE</p>
-<ol class="arabic simple" start="2">
-<li><p>DEBUG_LEVELに、ログ出力のレベルを指定する。
-指定したレベル以上のログが出力される。
-例：DEBUG_LEVEL_INFO を指定すると、ERROR,WARN,INFOが出力される。</p></li>
-<li><p>使用したいlevelのdebug printを通常のprint文のように記述する。
-複数引数にも対応している。</p></li>
+<ol class="arabic simple">
+<li><p>debug printを使用したいファイルで以下のようにimportする。</p></li>
 </ol>
-<p>debug levelの目安</p>
-<p>ERROR : プレー続行不可能になるようなエラー
-WARN  : プレー続行不可能とはならないような警告
-INFO  : 他スレッドとの結合動作において表示したい情報
-DEBUG : 自スレッドのみの単体デバッグにおいて表示したい情報
-TRACE : 処理の開始終了や分岐の出入りなど、ルートを確認するための情報</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">debug</span> <span class="kn">import</span> <span class="n">ERROR</span><span class="p">,</span> <span class="n">WARN</span><span class="p">,</span> <span class="n">INFO</span><span class="p">,</span> <span class="n">DEBUG</span><span class="p">,</span> <span class="n">TRACE</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>DEBUG_LEVELに、ログ出力のレベルを指定する。</p></li>
+</ol>
+<div class="line-block">
+<div class="line">指定したレベル以上のログが出力される。</div>
+<div class="line">例： <code class="docutils literal notranslate"><span class="pre">DEBUG_LEVEL_INFO</span></code> を指定すると、ERROR,WARN,INFOが出力される。</div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>使用したいlevelのdebug printを通常のprint文のように記述する。</p></li>
+</ol>
+<div class="line-block">
+<div class="line">複数引数にも対応している。</div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>debug levelの目安</p></li>
+</ol>
+<div class="line-block">
+<div class="line">ERROR : プレー続行不可能になるようなエラー</div>
+<div class="line">WARN  : プレー続行不可能とはならないような警告</div>
+<div class="line">INFO  : 他スレッドとの結合動作において表示したい情報</div>
+<div class="line">DEBUG : 自スレッドのみの単体デバッグにおいて表示したい情報</div>
+<div class="line">TRACE : 処理の開始終了や分岐の出入りなど、ルートを確認するための情報</div>
+</div>
 <dl class="function">
 <dt id="debug.DEBUG">
-<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">DEBUG</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#debug.DEBUG" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">DEBUG</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/debug.html#DEBUG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#debug.DEBUG" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="debug.ERROR">
-<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">ERROR</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#debug.ERROR" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">ERROR</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/debug.html#ERROR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#debug.ERROR" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="debug.INFO">
-<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">INFO</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#debug.INFO" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">INFO</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/debug.html#INFO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#debug.INFO" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="debug.TRACE">
-<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">TRACE</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#debug.TRACE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">TRACE</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/debug.html#TRACE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#debug.TRACE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="debug.WARN">
-<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">WARN</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#debug.WARN" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">WARN</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/debug.html#WARN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#debug.WARN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="debug.debugPrint">
-<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">debugPrint</code><span class="sig-paren">(</span><em class="sig-param">level</em>, <em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#debug.debugPrint" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">debugPrint</code><span class="sig-paren">(</span><em class="sig-param">level</em>, <em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/debug.html#debugPrint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#debug.debugPrint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="debug.dummyFunc">
-<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">dummyFunc</code><span class="sig-paren">(</span><em class="sig-param">level</em>, <em class="sig-param">*args</em><span class="sig-paren">)</span><a class="headerlink" href="#debug.dummyFunc" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">debug.</code><code class="sig-name descname">dummyFunc</code><span class="sig-paren">(</span><em class="sig-param">level</em>, <em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/debug.html#dummyFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#debug.dummyFunc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
