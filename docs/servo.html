@@ -149,11 +149,67 @@
 <span id="servo-module"></span><h1>servo module<a class="headerlink" href="#module-servo" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="servo.Servo">
-<em class="property">class </em><code class="sig-prename descclassname">servo.</code><code class="sig-name descname">Servo</code><span class="sig-paren">(</span><em class="sig-param">pin_no</em><span class="sig-paren">)</span><a class="headerlink" href="#servo.Servo" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">servo.</code><code class="sig-name descname">Servo</code><span class="sig-paren">(</span><em class="sig-param">address</em>, <em class="sig-param">initial_pulse_length=400</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/servo.html#Servo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#servo.Servo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>PCA9685 driver class</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">servo</span> <span class="k">import</span> <span class="n">Servo</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">adress</span> <span class="o">=</span> <span class="mh">0x41</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Servo</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Servo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="mi">610</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="servo.Servo._address">
+<code class="sig-name descname">_address</code><a class="headerlink" href="#servo.Servo._address" title="Permalink to this definition">¶</a></dt>
+<dd><p>slave address</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="servo.Servo._pwm">
+<code class="sig-name descname">_pwm</code><a class="headerlink" href="#servo.Servo._pwm" title="Permalink to this definition">¶</a></dt>
+<dd><p>pwm control class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Adafruit_PCA9685.PCA9685</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="servo.Servo._current_pulse_length">
+<code class="sig-name descname">_current_pulse_length</code><a class="headerlink" href="#servo.Servo._current_pulse_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>pulse length [us?]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>set 0 degree : pulse length = 400
+set 90 degree : pulse length = 610</p>
+</div>
+<dl class="method">
+<dt id="servo.Servo.down">
+<code class="sig-name descname">down</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/servo.html#Servo.down"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#servo.Servo.down" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="servo.Servo.up">
+<code class="sig-name descname">up</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/servo.html#Servo.up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#servo.Servo.up" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="servo.Servo.write">
-<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">target_duty</em>, <em class="sig-param">duration</em>, <em class="sig-param">diff_t</em><span class="sig-paren">)</span><a class="headerlink" href="#servo.Servo.write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">target_pulse_length</em>, <em class="sig-param">duration</em>, <em class="sig-param">diff_t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/servo.html#Servo.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#servo.Servo.write" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

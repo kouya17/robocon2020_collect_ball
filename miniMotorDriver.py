@@ -4,6 +4,15 @@ import smbus
 from debug import ERROR, WARN, INFO, DEBUG, TRACE
 
 
+"""
+
+Grove I2C Mini Motor Driver Class
+
+DataSeet:https://www.seeedstudio.com/Grove-I2C-Mini-Motor-Driver.html
+
+"""
+
+
 class MiniMotorDriver:
     # @brief コンスタラクタ
     # @detail 初期化処理を行う

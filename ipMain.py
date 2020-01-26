@@ -6,6 +6,14 @@ import os
 from imageProcessing import ImageProcessing
 from debug import ERROR, WARN, INFO, DEBUG, TRACE
 
+
+"""
+
+test program for image processing
+
+"""
+
+
 # 共有メモリの構造体
 class Point(Structure):
     _fields_ = [('ballAngle', c_int), ('ballDis', c_int)]
@@ -29,4 +37,3 @@ if __name__ == '__main__':
     DEBUG('p_imageProcessing started')
 
     p_imageProcessing.join()
-

@@ -50,4 +50,3 @@ class Servo:
     
     def down(self):
         self.write(400, 3, 0.1)
-

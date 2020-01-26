@@ -1,7 +1,7 @@
 # coding: UTF-8
 
 import smbus
-from debug import DEBUG, TRACE
+from debug import DEBUG, TRACE, INFO
 
 
 class Gp2y0e:
