@@ -155,6 +155,9 @@
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
+    <span class="c1"># このセンサが一周した時の積分値</span>
+    <span class="n">ONE_ROUND_VALUE</span> <span class="o">=</span> <span class="mi">3600</span>
+    
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_interval_sec</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
         <span class="n">TRACE</span><span class="p">(</span><span class="s1">&#39;Imu generated&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mpu9250</span> <span class="o">=</span> <span class="n">FaBo9Axis_MPU9250</span><span class="o">.</span><span class="n">MPU9250</span><span class="p">()</span>
@@ -162,26 +165,64 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_degree</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_interval_sec</span> <span class="o">=</span> <span class="n">update_interval_sec</span>
     
-<div class="viewcode-block" id="Imu.calibrate"><a class="viewcode-back" href="../imu.html#imu.Imu.calibrate">[docs]</a>    <span class="k">def</span> <span class="nf">calibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">interval_sec</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+<div class="viewcode-block" id="Imu.calibrate"><a class="viewcode-back" href="../imu.html#imu.Imu.calibrate">[docs]</a>    <span class="k">def</span> <span class="nf">calibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">interval_sec</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
         <span class="n">DEBUG</span><span class="p">(</span><span class="s1">&#39;Imu.calibrate() start&#39;</span><span class="p">)</span>
         <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sec</span> <span class="o">/</span> <span class="n">interval_sec</span><span class="p">)</span>
         <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
             <span class="n">gyro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mpu9250</span><span class="o">.</span><span class="n">readGyro</span><span class="p">()</span>
             <span class="nb">sum</span> <span class="o">+=</span> <span class="n">gyro</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span> <span class="o">=</span> <span class="nb">sum</span> <span class="o">/</span> <span class="n">count</span></div>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval_sec</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span> <span class="o">=</span> <span class="nb">sum</span> <span class="o">/</span> <span class="n">count</span>
+        <span class="n">DEBUG</span><span class="p">(</span><span class="s1">&#39;Imu epsilon = &#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="Imu.reset"><a class="viewcode-back" href="../imu.html#imu.Imu.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_degree</span> <span class="o">=</span> <span class="mi">0</span></div>
     
+    <span class="c1"># 周回分を無視する</span>
+<div class="viewcode-block" id="Imu.ignore_round"><a class="viewcode-back" href="../imu.html#imu.Imu.ignore_round">[docs]</a>    <span class="k">def</span> <span class="nf">ignore_round</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">one_round_value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">degree</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">degree</span> <span class="o">%</span> <span class="n">one_round_value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="o">-</span><span class="n">degree</span> <span class="o">%</span> <span class="n">one_round_value</span><span class="p">)</span></div>
+    
+    <span class="c1"># 無駄に半周以上しないように角度を調整</span>
+<div class="viewcode-block" id="Imu.compress_degree_in_180"><a class="viewcode-back" href="../imu.html#imu.Imu.compress_degree_in_180">[docs]</a>    <span class="k">def</span> <span class="nf">compress_degree_in_180</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">one_round_value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        Note:</span>
+<span class="sd">            ignore_round()で周回分を丸めてから本関数を呼ぶこと</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">one_round_value</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">degree</span> <span class="o">-</span> <span class="p">(</span><span class="n">degree</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span> <span class="o">*</span> <span class="n">one_round_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">degree</span></div>
+    
+<div class="viewcode-block" id="Imu.calc_shortcut_degree"><a class="viewcode-back" href="../imu.html#imu.Imu.calc_shortcut_degree">[docs]</a>    <span class="k">def</span> <span class="nf">calc_shortcut_degree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">one_round_value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compress_degree_in_180</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_round</span><span class="p">(</span><span class="n">degree</span><span class="p">,</span> <span class="n">one_round_value</span><span class="p">),</span> <span class="n">one_round_value</span><span class="p">)</span></div>
+    
 <div class="viewcode-block" id="Imu.update_loop"><a class="viewcode-back" href="../imu.html#imu.Imu.update_loop">[docs]</a>    <span class="k">def</span> <span class="nf">update_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shmem</span><span class="p">):</span>
+        <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># どうやら10-20秒くらいで補正値を更新しないと、ドリフトの影響が無視出来なくなる</span>
+            <span class="c1"># リスタート準備中フラグが立っていたら、他のモジュールが待っていてくれているので、補正値の調整をする</span>
+            <span class="c1"># 補正が終わったらフラグをクリアして、他のモジュールに調整完了を知らせる</span>
+            <span class="k">if</span> <span class="n">shmem</span><span class="o">.</span><span class="n">preparingRestart</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrate</span><span class="p">()</span>
+                <span class="n">shmem</span><span class="o">.</span><span class="n">preparingRestart</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">gyro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mpu9250</span><span class="o">.</span><span class="n">readGyro</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_degree</span> <span class="o">+=</span> <span class="n">gyro</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span>
+            <span class="c1"># 画像認識は右側正、左側負なので、そちらの挙動と合わせるために符号反転させる</span>
+            <span class="n">shmem</span><span class="o">.</span><span class="n">bodyAngle</span> <span class="o">=</span> <span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calc_shortcut_degree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_degree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ONE_ROUND_VALUE</span><span class="p">))</span>
+            <span class="n">DEBUG</span><span class="p">(</span><span class="s1">&#39;bodyAngle = &#39;</span><span class="p">,</span> <span class="n">shmem</span><span class="o">.</span><span class="n">bodyAngle</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_interval_sec</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Imu.print_angle"><a class="viewcode-back" href="../imu.html#imu.Imu.print_angle">[docs]</a>    <span class="k">def</span> <span class="nf">print_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">gyro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mpu9250</span><span class="o">.</span><span class="n">readGyro</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_degree</span> <span class="o">+=</span> <span class="n">gyro</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span>
-            <span class="n">shmem</span><span class="o">.</span><span class="n">bodyAngle</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_degree</span><span class="p">)</span>
-            <span class="n">DEBUG</span><span class="p">(</span><span class="s1">&#39;bodyAngle = &#39;</span><span class="p">,</span> <span class="n">shmem</span><span class="o">.</span><span class="n">bodyAngle</span><span class="p">)</span>
+            <span class="n">DEBUG</span><span class="p">(</span><span class="s1">&#39;bodyAngle = &#39;</span><span class="p">,</span> <span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calc_shortcut_degree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_degree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ONE_ROUND_VALUE</span><span class="p">)))</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_interval_sec</span><span class="p">)</span></div>
-            
+    
 <div class="viewcode-block" id="Imu.target"><a class="viewcode-back" href="../imu.html#imu.Imu.target">[docs]</a>    <span class="k">def</span> <span class="nf">target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shmem</span><span class="p">):</span>
         <span class="n">DEBUG</span><span class="p">(</span><span class="s1">&#39;Imu target() start&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_loop</span><span class="p">(</span><span class="n">shmem</span><span class="p">)</span></div>

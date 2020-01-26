@@ -14,6 +14,6 @@ This project uses [sphinx](https://www.sphinx-doc.org/) to generate api docments
 ### How to build
 
 ```bash
-./build_docments
+./build_docments.sh
 ```
 HTML documents are generated on `/docs` by this command.

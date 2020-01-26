@@ -18,9 +18,10 @@ class ImageProcessing:
     DISABLE = 0
     DEBUG_IMSHOW = ENABLE
 
-    RED_HSV_RANGE_MIN_1 = [0, 120, 30]
-    RED_HSV_RANGE_MAX_1 = [10, 255, 255]
-    RED_HSV_RANGE_MIN_2 = [160, 120, 30]
+    # マスクパラメータはあんまり厳しくしすぎると、本番で認識しないという事態になりそうで怖い
+    RED_HSV_RANGE_MIN_1 = [0, 130, 30]
+    RED_HSV_RANGE_MAX_1 = [2, 255, 255]
+    RED_HSV_RANGE_MIN_2 = [160, 130, 30]
     RED_HSV_RANGE_MAX_2 = [179, 255, 255]
     BLUE_HSV_RANGE_MIN = [55, 70, 10]
     BLUE_HSV_RANGE_MAX = [120, 150, 80]
@@ -29,6 +30,10 @@ class ImageProcessing:
 
     CAMERA_CENTER_CX = 240
     CAMERA_CENTER_CY = 240
+    
+    # 色認識において、これ以下の面積の結果は無視する
+    IGNORE_AREA_SIZE_RED = 1000
+    IGNORE_AREA_SIZE_YELLOW = 1000
 
     # @brief コンスタラクタ
     # @detail 初期化処理を行う
@@ -62,25 +67,47 @@ class ImageProcessing:
 
         _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        convex_hull_list = []
-        for contour in contours:
-            approx = cv2.convexHull(contour)
+        if color_name == 'RED':
+            convex_hull_list = []
+            for contour in contours:
+                approx = cv2.convexHull(contour)
 
-            M = cv2.moments(approx)
-            convex_hull_list.append({'approx': approx, 'moment': M})
+                M = cv2.moments(approx)
+                convex_hull_list.append({'approx': approx, 'moment': M})
 
-        if len(convex_hull_list) > 0:
-            max_convex_hull = max(convex_hull_list, key=(lambda x: x['moment']['m00']))
-            if max_convex_hull['moment']['m00'] > 0:
-                area_size = max_convex_hull['moment']['m00']
+            if len(convex_hull_list) > 0:
+                max_convex_hull = max(convex_hull_list, key=(lambda x: x['moment']['m00']))
+                if max_convex_hull['moment']['m00'] > 0:
+                    area_size = max_convex_hull['moment']['m00']
 
-                cx = int(max_convex_hull['moment']['m10'] / max_convex_hull['moment']['m00'])
-                cy = int(max_convex_hull['moment']['m01'] / max_convex_hull['moment']['m00'])
+                    cx = int(max_convex_hull['moment']['m10'] / max_convex_hull['moment']['m00'])
+                    cy = int(max_convex_hull['moment']['m01'] / max_convex_hull['moment']['m00'])
 
-                return cx, cy, area_size, max_convex_hull['approx']
-            return -1, -1, 0.0, []
-        else:
-            return -1, -1, 0.0, []
+                    return cx, cy, area_size, max_convex_hull['approx']
+                return -1, -1, 0.0, []
+            else:
+                return -1, -1, 0.0, []
+        elif color_name == 'YELLOW':
+            convex_hull_list = []
+            for contour in contours:
+                approx = cv2.approxPolyDP(contour, 0.01 * cv2.arcLength(contour, True), True)
+                # 四角形に近い形のみ扱う
+                if 3 < len(approx) < 10:
+                    M = cv2.moments(approx)
+                    convex_hull_list.append({'approx': approx, 'moment': M})
+
+            if len(convex_hull_list) > 0:
+                max_convex_hull = max(convex_hull_list, key=(lambda x: x['moment']['m00']))
+                if max_convex_hull['moment']['m00'] > 0:
+                    area_size = max_convex_hull['moment']['m00']
+
+                    cx = int(max_convex_hull['moment']['m10'] / max_convex_hull['moment']['m00'])
+                    cy = int(max_convex_hull['moment']['m01'] / max_convex_hull['moment']['m00'])
+
+                    return cx, cy, area_size, max_convex_hull['approx']
+                return -1, -1, 0.0, []
+            else:
+                return -1, -1, 0.0, []
 
     # @brief 十字マーカーを描画する
     # @param x 十字マーカーのx座標
@@ -102,7 +129,7 @@ class ImageProcessing:
         
         return int(ball_angle), int(ball_distance)
 
-    def imageProcessingFrame(self, frame, shmem):
+    def imageProcessingFrame(self, frame):
         # HSV色空間に変換
         hsv_img = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         cv2.line(frame, (self.CAMERA_CENTER_CX, 0), (self.CAMERA_CENTER_CX, 480),
@@ -120,11 +147,20 @@ class ImageProcessing:
         if yellow_cx > -1:
             self.draw_marker(frame, yellow_cx, yellow_cy, (30, 255, 255))
 
-        DEBUG('Red :' + str(red_area_size).rjust(8))
-        DEBUG('Yellow :' + str(yellow_area_size).rjust(8))
+        INFO('RedSize :' + str(red_area_size).rjust(8))
+        INFO('YellowSize :' + str(yellow_area_size).rjust(8))
 
-        red_ball_angle, red_ball_distance = self.calcBallDirection(red_cx, red_cy)
-        station_angle, station_distance = self.calcBallDirection(yellow_cx, yellow_cy)
+        # 認識できた部分の面積が小さい場合は結果を無視し、distanceに不正な値を入れる
+        if red_area_size > self.IGNORE_AREA_SIZE_RED:
+            red_ball_angle, red_ball_distance = self.calcBallDirection(red_cx, red_cy)
+        else:
+            red_ball_angle = 0
+            red_ball_distance = -1
+        if yellow_area_size > self.IGNORE_AREA_SIZE_YELLOW:
+            station_angle, station_distance = self.calcBallDirection(yellow_cx, yellow_cy)
+        else:
+            station_angle = 0
+            station_distance = -1
 
         return red_ball_angle, red_ball_distance, station_angle, station_distance
 
@@ -142,7 +178,7 @@ class ImageProcessing:
                     # 画像を取得し、stream.arrayにRGBの順で映像データを格納
                     camera.capture(stream, 'bgr', use_video_port=True)
 
-                    red_ball_angle, red_ball_distance, station_angle, station_distance = self.imageProcessingFrame(stream.array, shmem)
+                    red_ball_angle, red_ball_distance, station_angle, station_distance = self.imageProcessingFrame(stream.array)
 
                     DEBUG('red ball: angle =' + str(red_ball_angle).rjust(5) + ', distance = ' + str(red_ball_distance).rjust(5))
                     DEBUG('station: angle =' + str(station_angle).rjust(5) + ', distance = ' + str(station_distance).rjust(5))

@@ -144,7 +144,7 @@
 <span></span><span class="c1"># coding: UTF-8</span>
 
 <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Process</span><span class="p">,</span> <span class="n">Value</span>
-<span class="kn">from</span> <span class="nn">ctypes</span> <span class="k">import</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">c_int</span>
+<span class="kn">from</span> <span class="nn">ctypes</span> <span class="k">import</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">c_int</span><span class="p">,</span> <span class="n">c_bool</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">motorContl</span> <span class="k">import</span> <span class="n">MotorController</span>
 <span class="kn">from</span> <span class="nn">imageProcessing</span> <span class="k">import</span> <span class="n">ImageProcessing</span>
@@ -160,7 +160,9 @@
 
 <span class="c1"># 共有メモリの構造体</span>
 <div class="viewcode-block" id="Point"><a class="viewcode-back" href="../main.html#main.Point">[docs]</a><span class="k">class</span> <span class="nc">Point</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
-    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;ballAngle&#39;</span><span class="p">,</span> <span class="n">c_int</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;ballDis&#39;</span><span class="p">,</span> <span class="n">c_int</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;stationAngle&#39;</span><span class="p">,</span> <span class="n">c_int</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;stationDis&#39;</span><span class="p">,</span> <span class="n">c_int</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;bodyAngle&#39;</span><span class="p">,</span> <span class="n">c_int</span><span class="p">)]</span></div>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;ballAngle&#39;</span><span class="p">,</span> <span class="n">c_int</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;ballDis&#39;</span><span class="p">,</span> <span class="n">c_int</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;stationAngle&#39;</span><span class="p">,</span> <span class="n">c_int</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;stationDis&#39;</span><span class="p">,</span> <span class="n">c_int</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;bodyAngle&#39;</span><span class="p">,</span> <span class="n">c_int</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;preparingRestart&#39;</span><span class="p">,</span> <span class="n">c_bool</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;relyStation&#39;</span><span class="p">,</span> <span class="n">c_bool</span><span class="p">)]</span></div>
 
 
 <div class="viewcode-block" id="info"><a class="viewcode-back" href="../main.html#main.info">[docs]</a><span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
@@ -174,12 +176,16 @@
     <span class="n">info</span><span class="p">(</span><span class="s1">&#39;main line&#39;</span><span class="p">)</span>
     <span class="c1"># 共有メモリの準備</span>
     <span class="n">shmem</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">shmem</span><span class="o">.</span><span class="n">preparingRestart</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">shmem</span><span class="o">.</span><span class="n">relyStation</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="c1"># モータ制御インスタンスの生成</span>
     <span class="n">motorController</span> <span class="o">=</span> <span class="n">MotorController</span><span class="p">()</span>
     <span class="c1"># 画像処理インスタンスの生成</span>
     <span class="n">imageProcessing</span> <span class="o">=</span> <span class="n">ImageProcessing</span><span class="p">()</span>
     <span class="c1"># 慣性計測インスタンスの生成</span>
     <span class="n">imu</span> <span class="o">=</span> <span class="n">Imu</span><span class="p">()</span>
+    <span class="c1"># スタート時に一度ジャイロセンサの補正をしておく</span>
+    <span class="n">imu</span><span class="o">.</span><span class="n">calibrate</span><span class="p">()</span>
 
     <span class="n">p_motorContl</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">motorController</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">shmem</span><span class="p">,))</span>
     <span class="n">p_imageProcessing</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">imageProcessing</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">shmem</span><span class="p">,))</span>

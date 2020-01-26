@@ -21,13 +21,14 @@ motor controle module
 class MotionStateE(Enum):
     CHASE_BALL = 0
     GO_TO_STATION = 1
+    PREPARE_RESTART = 2
+
 
 # モータ制御用クラス
 class MotorController:
-    #移動アルゴリズム切り替え用変数
+    # 移動アルゴリズム切り替え用変数
     DEBUG_SHOOT_ALGORITHM = 2
     DEBUG_CHASE_ALGORITHM = 1
-
 
     # モータ制御用パラメータ群
     # ボール保持状態判定閾値
@@ -46,14 +47,16 @@ class MotorController:
     SPEED_NOTHING_TO_DO = 5, -5
     # 停止
     SPEED_STOP = 0, 0
+    # 首振りモード時旋回パラメータ
+    SPEED_SWING_ROTATE = 50, -50
     # 設定値->モータ値対応付け用辞書
     DIC_SETTING_TO_MOTOR_VALUE = {'STOP' : (0, 0)}
 
     # 移動アルゴリズム1, 2で使用
     # ボール追跡時の基準スピード
-    SPEED_CHASE = 20
+    SPEED_CHASE = 50
     # ボール追跡時の比例項の係数
-    K_CHASE_ANGLE = 0.4  # SPEED_CHASE / 180にするとよい？
+    K_CHASE_ANGLE = 0.5  # SPEED_CHASE / 180にするとよい？
 
     # コンストラクタ
     def __init__(self):
@@ -70,6 +73,8 @@ class MotorController:
         self.right_motor = MiniMotorDriver(0x60)
         self.servo = Servo(0x41)
         self.servo.up()
+        # ボール追跡モード管理用インスタンス生成
+        self.chaseBallMode = ChaseMode()
         # 動作状態初期化
         self.motion_status = MotionStateE.CHASE_BALL
 
@@ -166,8 +171,25 @@ class MotorController:
     def calcMotorPowers(self, shmem, motion_status):
         # 現在の状態に応じて追跡対象を変える
         if motion_status == MotionStateE.CHASE_BALL:
-            return self.calcMotorPowersByBallAngle(shmem.ballAngle)
-        
+            TRACE('motion_status = CHASE_BALL')
+            if shmem.ballDis != -1:
+                return self.calcMotorPowersByBallAngle(shmem.ballAngle)
+            TRACE('shmem.ballDis is invalid value')
+            if self.chaseBallMode.now() == ChaseMode.NORMAL:
+                TRACE('chaseBallMode = NORMAL')
+                return self.calcMotorPowersByBallAngle(shmem.bodyAngle / 10)
+            # ボールが視界になくて、首振りモードの時はボールを見つけるためにとりあえず旋回する
+            DEBUG('chaseBallMode = SWING')
+            return MotorController.SPEED_SWING_ROTATE
+        elif motion_status == MotionStateE.GO_TO_STATION:
+            TRACE('motion_status = GO_TO_STATION')
+            if shmem.stationDis != -1:
+                return self.calcMotorPowersByBallAngle(shmem.stationAngle)
+            TRACE('shmem.ballDis is invalid value')
+            body_angle = shmem.bodyAngle
+            return self.calcMotorPowersByBallAngle(body_angle / 10 - (body_angle / abs(body_angle) * 180))
+        # PREPARE_RETART
+        TRACE('motion_status = PREPARE_RESTART')
         return self.calcMotorPowersByBallAngle(shmem.stationAngle)
 
     # モータの値を計算しドライバへ送る
@@ -176,29 +198,34 @@ class MotorController:
             if self.motion_status == MotionStateE.CHASE_BALL:
                 # ボール捕獲に移る
                 if 100 < shmem.ballDis < 130:
+                    INFO('capture ball')
                     self.left_motor.drive(0)
                     self.right_motor.drive(0)
                     self.servo.down()
-                    time.sleep(5)
+                    time.sleep(1)
                     self.motion_status = MotionStateE.GO_TO_STATION
             elif self.motion_status == MotionStateE.GO_TO_STATION:
                 distanceSensorValue = self.distanceSensor.read()
                 DEBUG('distanceSensor = ' + str(distanceSensorValue))
                 # ボール消失してる
                 if distanceSensorValue > 15:
+                    INFO('lost ball')
                     self.servo.up()
                     self.motion_status = MotionStateE.CHASE_BALL
                 # TODO: ステーション到着後の動き
-                if 300 < shmem.stationDis < 330:
+                if 315 < shmem.stationDis < 355:
+                    INFO('reached station')
                     self.left_motor.drive(0)
                     self.right_motor.drive(0)
                     self.servo.up()
+                    # ステーションに向かっている間に追跡モードがどうなっているか分からないので、通常にリセットしておく
+                    self.chaseBallMode.set_mode(ChaseMode.NORMAL)
                     self.motion_status = MotionStateE.CHASE_BALL
             
             # モータ値計算
             motorPowers = self.calcMotorPowers(shmem, self.motion_status)
             # モーター値後処理(現在は首振り検知処理のみ)
-            #motorPowers = self.motorControlPostProcessor.escapeSwing(motorPowers)
+            # motorPowers = self.motorControlPostProcessor.escapeSwing(motorPowers)
             # モータ値を正常値にまるめる
             motorPowers = self.roundOffMotorSpeeds(motorPowers)
             # モータ値送信
@@ -206,7 +233,8 @@ class MotorController:
             self.right_motor.drive(motorPowers[1])
             # とりあえず一定時間間隔で動かす
             INFO('motor l=' + str(motorPowers[0]).rjust(4) + ', r=' + str(motorPowers[1]).rjust(4),
-                 'ball=' + str(shmem.ballAngle).rjust(4) + ',' + str(shmem.ballDis).rjust(4),
+                 'red=' + str(shmem.ballAngle).rjust(4) + ',' + str(shmem.ballDis).rjust(4),
+                 'yellow=' + str(shmem.stationAngle).rjust(4) + ',' + str(shmem.stationDis).rjust(4),
                  )
             time.sleep(0.1)
     
@@ -304,3 +332,43 @@ class MotorControlPostProcessor:
                 # 首振り検知用方向転換数をリセット
                 self.count_direction_change_detect_swing = 1
             DEBUG('count_derection_change_detect_swing = ', self.count_direction_change_detect_swing)
+
+
+class ChaseMode:
+    """
+    
+    Manage chase methods
+    
+    Examples:
+        >>> chaseMode = ChaseMode(initial_mode)
+        >>> now_chase_mode = cheseMode.now()
+        >>> if now_chase_mode is HOGE:
+        >>>     hoge = fuga
+    
+    """
+    NORMAL = 0
+    SWING = 1
+    
+    def __init__(self, max_normal_time_sec=3, max_swing_time_sec=2):
+        self._mode = ChaseMode.NORMAL
+        self._now_mode_start_time = time.time()
+        self._MAX_NORMAL_TIME_SEC = 5
+        self._MAX_SWING_TIME_SEC = 4
+    
+    def now(self):
+        self.__update()
+        return self._mode
+    
+    def set_mode(self, mode):
+        self._now_mode_start_time = time.time()
+        self._mode = mode
+    
+    def __update(self):
+        if self._mode == ChaseMode.NORMAL:
+            if time.time() - self._now_mode_start_time > self._MAX_NORMAL_TIME_SEC:
+                self._now_mode_start_time = time.time()
+                self._mode = ChaseMode.SWING
+        if self._mode == ChaseMode.SWING:
+            if time.time() - self._now_mode_start_time > self._MAX_SWING_TIME_SEC:
+                self._now_mode_start_time = time.time()
+                self._mode = ChaseMode.NORMAL

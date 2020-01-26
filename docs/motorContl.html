@@ -148,6 +148,40 @@
   <div class="section" id="module-motorContl">
 <span id="motorcontl-module"></span><h1>motorContl module<a class="headerlink" href="#module-motorContl" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
+<dt id="motorContl.ChaseMode">
+<em class="property">class </em><code class="sig-prename descclassname">motorContl.</code><code class="sig-name descname">ChaseMode</code><span class="sig-paren">(</span><em class="sig-param">max_normal_time_sec=3</em>, <em class="sig-param">max_swing_time_sec=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/motorContl.html#ChaseMode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motorContl.ChaseMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manage chase methods</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chaseMode</span> <span class="o">=</span> <span class="n">ChaseMode</span><span class="p">(</span><span class="n">initial_mode</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">now_chase_mode</span> <span class="o">=</span> <span class="n">cheseMode</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">now_chase_mode</span> <span class="ow">is</span> <span class="n">HOGE</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">hoge</span> <span class="o">=</span> <span class="n">fuga</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="motorContl.ChaseMode.NORMAL">
+<code class="sig-name descname">NORMAL</code><em class="property"> = 0</em><a class="headerlink" href="#motorContl.ChaseMode.NORMAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.ChaseMode.SWING">
+<code class="sig-name descname">SWING</code><em class="property"> = 1</em><a class="headerlink" href="#motorContl.ChaseMode.SWING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.ChaseMode.now">
+<code class="sig-name descname">now</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/motorContl.html#ChaseMode.now"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motorContl.ChaseMode.now" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="motorContl.ChaseMode.set_mode">
+<code class="sig-name descname">set_mode</code><span class="sig-paren">(</span><em class="sig-param">mode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/motorContl.html#ChaseMode.set_mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motorContl.ChaseMode.set_mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="motorContl.MotionStateE">
 <em class="property">class </em><code class="sig-prename descclassname">motorContl.</code><code class="sig-name descname">MotionStateE</code><a class="reference internal" href="_modules/motorContl.html#MotionStateE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#motorContl.MotionStateE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
@@ -160,6 +194,11 @@
 <dl class="attribute">
 <dt id="motorContl.MotionStateE.GO_TO_STATION">
 <code class="sig-name descname">GO_TO_STATION</code><em class="property"> = 1</em><a class="headerlink" href="#motorContl.MotionStateE.GO_TO_STATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotionStateE.PREPARE_RESTART">
+<code class="sig-name descname">PREPARE_RESTART</code><em class="property"> = 2</em><a class="headerlink" href="#motorContl.MotionStateE.PREPARE_RESTART" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -241,12 +280,12 @@
 
 <dl class="attribute">
 <dt id="motorContl.MotorController.K_CHASE_ANGLE">
-<code class="sig-name descname">K_CHASE_ANGLE</code><em class="property"> = 0.4</em><a class="headerlink" href="#motorContl.MotorController.K_CHASE_ANGLE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">K_CHASE_ANGLE</code><em class="property"> = 0.5</em><a class="headerlink" href="#motorContl.MotorController.K_CHASE_ANGLE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="motorContl.MotorController.SPEED_CHASE">
-<code class="sig-name descname">SPEED_CHASE</code><em class="property"> = 20</em><a class="headerlink" href="#motorContl.MotorController.SPEED_CHASE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SPEED_CHASE</code><em class="property"> = 50</em><a class="headerlink" href="#motorContl.MotorController.SPEED_CHASE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -272,6 +311,11 @@
 <dl class="attribute">
 <dt id="motorContl.MotorController.SPEED_STOP">
 <code class="sig-name descname">SPEED_STOP</code><em class="property"> = (0, 0)</em><a class="headerlink" href="#motorContl.MotorController.SPEED_STOP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="motorContl.MotorController.SPEED_SWING_ROTATE">
+<code class="sig-name descname">SPEED_SWING_ROTATE</code><em class="property"> = (50, -50)</em><a class="headerlink" href="#motorContl.MotorController.SPEED_SWING_ROTATE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

@@ -152,14 +152,43 @@
 <em class="property">class </em><code class="sig-prename descclassname">imu.</code><code class="sig-name descname">Imu</code><span class="sig-paren">(</span><em class="sig-param">update_interval_sec=0.1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imu.html#Imu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#imu.Imu" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>IMU driver class</p>
+<dl class="attribute">
+<dt id="imu.Imu.ONE_ROUND_VALUE">
+<code class="sig-name descname">ONE_ROUND_VALUE</code><em class="property"> = 3600</em><a class="headerlink" href="#imu.Imu.ONE_ROUND_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="imu.Imu.calc_shortcut_degree">
+<code class="sig-name descname">calc_shortcut_degree</code><span class="sig-paren">(</span><em class="sig-param">degree</em>, <em class="sig-param">one_round_value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imu.html#Imu.calc_shortcut_degree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#imu.Imu.calc_shortcut_degree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="imu.Imu.calibrate">
-<code class="sig-name descname">calibrate</code><span class="sig-paren">(</span><em class="sig-param">sec=5</em>, <em class="sig-param">interval_sec=0.1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imu.html#Imu.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#imu.Imu.calibrate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">calibrate</code><span class="sig-paren">(</span><em class="sig-param">sec=3</em>, <em class="sig-param">interval_sec=0.05</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imu.html#Imu.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#imu.Imu.calibrate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="imu.Imu.close">
 <code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imu.html#Imu.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#imu.Imu.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="imu.Imu.compress_degree_in_180">
+<code class="sig-name descname">compress_degree_in_180</code><span class="sig-paren">(</span><em class="sig-param">degree</em>, <em class="sig-param">one_round_value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imu.html#Imu.compress_degree_in_180"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#imu.Imu.compress_degree_in_180" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>ignore_round()で周回分を丸めてから本関数を呼ぶこと</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="imu.Imu.ignore_round">
+<code class="sig-name descname">ignore_round</code><span class="sig-paren">(</span><em class="sig-param">degree</em>, <em class="sig-param">one_round_value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/imu.html#Imu.ignore_round"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#imu.Imu.ignore_round" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="imu.Imu.print_angle">
+<code class="sig-name descname">print_angle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/imu.html#Imu.print_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#imu.Imu.print_angle" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
