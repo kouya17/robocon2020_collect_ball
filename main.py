@@ -6,6 +6,7 @@ import os
 from motorContl import MotorController
 from imageProcessing import ImageProcessing
 from imu import Imu
+# from socketServer import Server
 from debug import ERROR, WARN, INFO, DEBUG, TRACE
 
 """
@@ -43,10 +44,13 @@ if __name__ == '__main__':
     imu = Imu()
     # スタート時に一度ジャイロセンサの補正をしておく
     imu.calibrate()
+    # websocketサーバの生成
+    # server = Server(9001)
 
     p_motorContl = Process(target=motorController.target, args=(shmem,))
     p_imageProcessing = Process(target=imageProcessing.target, args=(shmem,))
     p_imu = Process(target=imu.target, args=(shmem,))
+    # p_server = Process(target=server.target, args=())
     
     p_motorContl.start()
     DEBUG('p_motorContl started')
@@ -54,7 +58,10 @@ if __name__ == '__main__':
     DEBUG('p_imageProcessing started')
     p_imu.start()
     DEBUG('p_imu started')
+    # p_server.start()
+    # DEBUG('p_server started')
 
     p_motorContl.join()
     p_imageProcessing.join()
     p_imu.join()
+    # p_server.join()
