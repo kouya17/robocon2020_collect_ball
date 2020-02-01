@@ -32,7 +32,7 @@ class ImageProcessing:
     CAMERA_CENTER_CY = 240
     
     # 色認識において、これ以下の面積の結果は無視する
-    IGNORE_AREA_SIZE_RED = 1000
+    IGNORE_AREA_SIZE_BALL = 1000
     IGNORE_AREA_SIZE_YELLOW = 1000
 
     # @brief コンスタラクタ
@@ -61,13 +61,17 @@ class ImageProcessing:
             hsv_range_min = self.YELLOW_HSV_RANGE_MIN
             hsv_range_max = self.YELLOW_HSV_RANGE_MAX
             mask = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
+        elif color_name == 'BLUE':
+            hsv_range_min = self.BLUE_HSV_RANGE_MIN
+            hsv_range_max = self.BLUE_HSV_RANGE_MAX
+            mask = cv2.inRange(hsv_img, np.array(hsv_range_min), np.array(hsv_range_max))
             
         if self.DEBUG_IMSHOW == self.ENABLE:
             cv2.imshow('Mask' + color_name, cv2.flip(mask, -1))
 
         _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        if color_name == 'RED':
+        if color_name == 'RED' or color_name == 'BLUE':
             convex_hull_list = []
             for contour in contours:
                 approx = cv2.convexHull(contour)
@@ -147,22 +151,32 @@ class ImageProcessing:
         if yellow_cx > -1:
             self.draw_marker(frame, yellow_cx, yellow_cy, (30, 255, 255))
 
+        # 青色領域の検知
+        blue_cx, blue_cy, blue_area_size, blue_convex = self.colorDetect2(hsv_img, 'BLUE')
+        if blue_cx > -1:
+            self.draw_marker(frame, blue_cx, blue_cy, (30, 30, 255))
+        
         INFO('RedSize :' + str(red_area_size).rjust(8))
         INFO('YellowSize :' + str(yellow_area_size).rjust(8))
+        INFO('BlueSize :' + str(blue_area_size).rjust(8))
 
         # 認識できた部分の面積が小さい場合は結果を無視し、distanceに不正な値を入れる
-        if red_area_size > self.IGNORE_AREA_SIZE_RED:
-            red_ball_angle, red_ball_distance = self.calcBallDirection(red_cx, red_cy)
+        if red_area_size > blue_area_size and red_area_size > self.IGNORE_AREA_SIZE_BALL:
+            DEBUG('use RED area')
+            ball_angle, ball_distance = self.calcBallDirection(red_cx, red_cy)
+        elif blue_area_size > self.IGNORE_AREA_SIZE_BALL:
+            DEBUG('use BLUE area')
+            ball_angle, ball_distance = self.calcBallDirection(blue_cx, blue_cy)
         else:
-            red_ball_angle = 0
-            red_ball_distance = -1
+            ball_angle = 0
+            ball_distance = -1
         if yellow_area_size > self.IGNORE_AREA_SIZE_YELLOW:
             station_angle, station_distance = self.calcBallDirection(yellow_cx, yellow_cy)
         else:
             station_angle = 0
             station_distance = -1
 
-        return red_ball_angle, red_ball_distance, station_angle, station_distance
+        return ball_angle, ball_distance, station_angle, station_distance
 
     # @brief 画像処理のmain処理
     # @param shmem 共有メモリ
@@ -178,9 +192,9 @@ class ImageProcessing:
                     # 画像を取得し、stream.arrayにRGBの順で映像データを格納
                     camera.capture(stream, 'bgr', use_video_port=True)
 
-                    red_ball_angle, red_ball_distance, station_angle, station_distance = self.imageProcessingFrame(stream.array)
+                    ball_angle, ball_distance, station_angle, station_distance = self.imageProcessingFrame(stream.array)
 
-                    DEBUG('red ball: angle =' + str(red_ball_angle).rjust(5) + ', distance = ' + str(red_ball_distance).rjust(5))
+                    DEBUG('ball: angle =' + str(ball_angle).rjust(5) + ', distance = ' + str(ball_distance).rjust(5))
                     DEBUG('station: angle =' + str(station_angle).rjust(5) + ', distance = ' + str(station_distance).rjust(5))
                     
                     # 結果表示
@@ -192,8 +206,8 @@ class ImageProcessing:
                         cv2.moveWindow('MaskYELLOW', 964, 30)
               
                     # 共有メモリに書き込む
-                    shmem.ballAngle = int(red_ball_angle * 90 / 240)
-                    shmem.ballDis = int(red_ball_distance)
+                    shmem.ballAngle = int(ball_angle * 90 / 240)
+                    shmem.ballDis = int(ball_distance)
                     shmem.stationAngle = int(station_angle * 90 / 240)
                     shmem.stationDis = int(station_distance)
 
